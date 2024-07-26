@@ -26,22 +26,16 @@ maturin develop --release
 
 You should now be able to use the package:
 
-```
-(.env) Jack: xof-py % python3
-Python 3.12.4 (main, Jun  6 2024, 18:26:44) [Clang 15.0.0 (clang-1500.3.9.4)] on darwin
-Type "help", "copyright", "credits" or "license" for more information.
->>> from xof_py import shake_123
->>> shake_123().hex()
-'d6b9bdbda14c3858c36d'
->>> from hashlib import shake_128
->>> shake_128(b"123").hexdigest(10)
-'d6b9bdbda14c3858c36d'
+```py
+>>> from xof_py import pyo3_shake_128
+>>> pyo3_shake_128(b"cryptohack", 100).hex()
+'8d043455562ebedd1b3fcf5b0e0a058091752d161e7eef40364a565aacb3b5d3bbefa804de6087e77c4c211ef57ab83869e3e18627f8421540ae9a8b61da847d0da513c56c5feba397ab2b4a1a2ef67c6f17162c8dfdb41901ad70bca8195fd35bcea259'
 ```
 
 ### Speed Test
 
 ```
-(.env) Jack: xof-py % python3 speed_test.py
-10_000 calls with rust sha3: 0.010552167892456055
-10_000 calls with hashlib: 0.011549949645996094
+(.env) Jack: xof-py % python3 speed_test.py               
+10_000 calls with rust sha3: 0.0849299430847168
+10_000 calls with hashlib: 0.06996297836303711
 ```
