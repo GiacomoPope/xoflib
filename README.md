@@ -30,7 +30,10 @@ You should now be able to use the package:
 (.env) Jack: xof-py % python3
 Python 3.12.4 (main, Jun  6 2024, 18:26:44) [Clang 15.0.0 (clang-1500.3.9.4)] on darwin
 Type "help", "copyright", "credits" or "license" for more information.
->>> from xof_py import sum_as_string
->>> sum_as_string(1, 2)
-'3'
+>>> from xof_py import shake_123
+>>> shake_123().hex()
+'d6b9bdbda14c3858c36d'
+>>> from hashlib import shake_128
+>>> shake_128(b"123").hexdigest(10)
+'d6b9bdbda14c3858c36d'
 ```
