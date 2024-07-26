@@ -1,8 +1,16 @@
 import random
 from hashlib import shake_128
-from xof_py import pyo3_shake_128, pyo3_shake_128_one_block, pyo3_shake_128_n_blocks
+from xof_py import pyo3_shake_128, pyo3_shake_128_one_block, pyo3_shake_128_n_blocks, Shake128_pyo3
 import time
 import os
+
+for _ in range(100):
+    absorb = os.urandom(32)
+    n = random.randint(1, 1000)
+    a = shake_128(absorb).digest(n)
+    xof = Shake128_pyo3(absorb)
+    b = xof.read(n)
+    assert a == b
 
 for _ in range(100):
     absorb = os.urandom(32)
@@ -26,6 +34,14 @@ for _ in range(100):
 
 random.seed(0)
 t0 = time.time()
+xof = Shake128_pyo3(b"123")
+for _ in range(10_000):
+    n = random.randint(1, 5000)
+    a = xof.read(n)
+print(f"10_000 calls with class pyo3: {time.time() - t0 }")
+
+random.seed(0)
+t0 = time.time()
 for _ in range(10_000):
     n = random.randint(1, 5000)
     a = pyo3_shake_128(b"123", n)
@@ -38,7 +54,7 @@ for _ in range(10_000):
     a = shake_128(b"123").digest(n)
 print(f"10_000 calls with hashlib: {time.time() - t0}")
 
-print()
+print("-"*80)
 
 random.seed(0)
 t0 = time.time()
