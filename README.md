@@ -21,7 +21,7 @@ pip install maturin
 Then to build the package run
 
 ```
-maturin develop
+maturin develop --release
 ```
 
 You should now be able to use the package:
@@ -36,4 +36,12 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> from hashlib import shake_128
 >>> shake_128(b"123").hexdigest(10)
 'd6b9bdbda14c3858c36d'
+```
+
+### Speed Test
+
+```
+(.env) Jack: xof-py % python3 speed_test.py
+10_000 calls with rust sha3: 0.010552167892456055
+10_000 calls with hashlib: 0.011549949645996094
 ```
