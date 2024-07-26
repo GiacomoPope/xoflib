@@ -36,6 +36,15 @@ You should now be able to use the package:
 
 ```
 (.env) Jack: xof-py % python3 speed_test.py               
-10_000 calls with rust sha3: 0.0849299430847168
-10_000 calls with hashlib: 0.06996297836303711
+10_000 calls with rust sha3: 0.08595705032348633
+10_000 calls with hashlib: 0.06728601455688477
+
+10_000 one block calls with rust sha3: 0.01061105728149414
+10_000 one block calls with hashlib: 0.012787818908691406
+
+10_000 2 block calls with rust sha3: 0.016810894012451172
+10_000 2 block calls with hashlib: 0.01606297492980957
+
+10_000 n block calls with rust sha3: 0.08771300315856934
+10_000 n block calls with hashlib: 0.07766127586364746
 ```
