@@ -25,6 +25,7 @@ macro_rules! impl_sponge_shaker_classes {
 
         #[pymethods]
         impl $sponge_name {
+            /// Docstring for the read??
             fn read<'py>(&mut self, py: Python<'py>, n: usize) -> PyResult<Bound<'py, PyBytes>> {
                 PyBytes::new_bound_with(py, n, |bytes| {
                     self.xof.read(bytes);
@@ -96,6 +97,7 @@ macro_rules! impl_sponge_shaker_classes {
         impl $shaker_name {
             #[new]
             #[pyo3(signature = (input_bytes = None))]
+            /// Here is some docstrings...
             fn new(input_bytes: Option<&[u8]>) -> Self {
                 let mut hasher = $hasher::default();
                 if let Some(initial_data) = input_bytes {
@@ -103,11 +105,13 @@ macro_rules! impl_sponge_shaker_classes {
                 }
                 Self { hasher }
             }
-
+            
+            /// This should be the absorb one...
             fn absorb(&mut self, input_bytes: &[u8]) {
                 self.hasher.update(input_bytes);
             }
 
+            /// This should be the finalize one...
             fn finalize(&mut self) -> $sponge_name {
                 $sponge_name {
                     xof: self.hasher.finalize_xof_reset(),
@@ -142,7 +146,7 @@ impl_sponge_shaker_classes!(
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn xof(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn xof_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Sponge128>()?;
     m.add_class::<Shaker128>()?;
     m.add_class::<Sponge256>()?;
