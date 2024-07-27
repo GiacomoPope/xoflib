@@ -1,7 +1,10 @@
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use sha3::{
-    digest::{core_api::XofReaderCoreWrapper, ExtendableOutput, Update, XofReader},
+    digest::{
+        core_api::XofReaderCoreWrapper, crypto_common::BlockSizeUser, ExtendableOutput, Update,
+        XofReader,
+    },
     Shake128, Shake128ReaderCore,
 };
 
@@ -22,10 +25,8 @@ impl Shake128Py {
         Self { xof }
     }
 
-    fn read(&mut self, py: Python, n: usize) -> PyObject {
-        let mut res = vec![0u8; n];
-        self.xof.read(&mut res);
-        PyBytes::new_bound(py, &res).into()
+    fn read<'py>(&mut self, py: Python<'py>, n: usize) -> PyResult<Bound<'py, PyBytes>> {
+        PyBytes::new_bound_with(py, n, |bytes| Ok(self.xof.read(bytes)))
     }
 }
 
@@ -34,38 +35,37 @@ impl Shake128Py {
 /// Returns the first n bytes of Shake128 initialized with
 /// input_bytes
 #[pyfunction]
-fn pyo3_shake_128(py: Python, input_bytes: &[u8], n: usize) -> PyObject {
+fn pyo3_shake_128<'py>(
+    py: Python<'py>,
+    input_bytes: &[u8],
+    n: usize,
+) -> PyResult<pyo3::Bound<'py, PyBytes>> {
     let mut hasher = Shake128::default();
     hasher.update(input_bytes);
     let mut xof: sha3::digest::core_api::XofReaderCoreWrapper<sha3::Shake128ReaderCore> =
         hasher.finalize_xof();
-    let mut res = vec![0u8; n];
-    xof.read(&mut res);
-    PyBytes::new_bound(py, &res).into()
+    PyBytes::new_bound_with(py, n, |bytes: &mut [u8]| Ok(xof.read(bytes)))
 }
 
 /// Returns the first n bytes of Shake128 initialized with
 /// input_bytes
 #[pyfunction]
-fn pyo3_shake_128_one_block(py: Python, input_bytes: &[u8]) -> PyObject {
-    let mut hasher = Shake128::default();
-    hasher.update(input_bytes);
-    let mut xof = hasher.finalize_xof();
-    let mut res = [0u8; 168];
-    xof.read(&mut res);
-    PyBytes::new_bound(py, &res).into()
+fn pyo3_shake_128_one_block<'py>(
+    py: Python<'py>,
+    input_bytes: &[u8],
+) -> PyResult<Bound<'py, PyBytes>> {
+    pyo3_shake_128_n_blocks(py, input_bytes, 1)
 }
 
 /// Returns the first n bytes of Shake128 initialized with
 /// input_bytes
 #[pyfunction]
-fn pyo3_shake_128_n_blocks(py: Python, input_bytes: &[u8], n: usize) -> PyObject {
-    let mut hasher = Shake128::default();
-    hasher.update(input_bytes);
-    let mut xof = hasher.finalize_xof();
-    let mut res = vec![0u8; n * 168];
-    xof.read(&mut res);
-    PyBytes::new_bound(py, &res).into()
+fn pyo3_shake_128_n_blocks<'py>(
+    py: Python<'py>,
+    input_bytes: &[u8],
+    n: usize,
+) -> PyResult<Bound<'py, PyBytes>> {
+    pyo3_shake_128(py, input_bytes, n * Shake128::block_size())
 }
 
 /// A Python module implemented in Rust.
