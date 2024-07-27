@@ -1,9 +1,6 @@
 use pyo3::{exceptions::PyValueError, prelude::*, types::PyBytes};
 use sha3::{
-    digest::{
-        core_api::{CoreWrapper, XofReaderCoreWrapper},
-        ExtendableOutputReset, Update, XofReader,
-    },
+    digest::{consts::*, core_api::*, typenum::*, *},
     Shake128, Shake128ReaderCore, Shake256, Shake256ReaderCore, TurboShake128, TurboShake128Core,
     TurboShake128ReaderCore, TurboShake256, TurboShake256Core, TurboShake256ReaderCore,
 };
@@ -125,7 +122,7 @@ macro_rules! impl_sponge_shaker_classes {
     };
 }
 
-impl_sponge_shaker_classes!(Shake128, Shake128ReaderCore, Shaker128, Sponge128);
+// impl_sponge_shaker_classes!(Shake128, Shake128ReaderCore, Shaker128, Sponge128);
 impl_sponge_shaker_classes!(Shake256, Shake256ReaderCore, Shaker256, Sponge256);
 impl_sponge_shaker_classes!(
     TurboShake128,
@@ -139,6 +136,53 @@ impl_sponge_shaker_classes!(
     TurboShaker256,
     TurboSponge256
 );
+
+struct Shaker<H>
+where
+    H: BufferKindUser,
+    H::BlockSize: IsLess<U256>,
+    Le<H::BlockSize, U256>: NonZero,
+{
+    hasher: CoreWrapper<H>,
+}
+
+impl<H> Shaker<H>
+where
+    H: BufferKindUser + Default + UpdateCore,
+    CoreWrapper<H>: Copy + Clone + ExtendableOutputReset,
+    H::BlockSize: Default,
+    H::BufferKind: Default,
+    H::BlockSize: IsLess<U256>,
+    Le<H::BlockSize, U256>: NonZero,
+{
+    fn new(input_bytes: Option<&[u8]>) -> Self {
+        let mut hasher: CoreWrapper<H> = Default::default();
+        if let Some(initial_data) = input_bytes {
+            hasher.update(initial_data);
+        }
+        Self { hasher }
+    }
+
+    fn update(&mut self, data: &[u8]) {
+        self.hasher.update(data);
+    }
+
+    fn finalize_xof_reset(&mut self) -> Sponge<<CoreWrapper<H> as ExtendableOutput>::Reader> {
+        Sponge {
+            xof: self.hasher.finalize_xof_reset(),
+        }
+    }
+}
+
+struct Sponge<R: XofReader> {
+    xof: R,
+}
+
+impl<R: XofReader> Sponge<R> {
+    fn read(&mut self, out: &mut [u8]) {
+        self.xof.read(out);
+    }
+}
 
 /// A Python module implemented in Rust.
 #[pymodule]
