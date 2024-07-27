@@ -1,13 +1,15 @@
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
-use sha3::{digest::{core_api::XofReaderCoreWrapper, ExtendableOutput, Update, XofReader}, Shake128, Shake128ReaderCore};
-
+use sha3::{
+    digest::{core_api::XofReaderCoreWrapper, ExtendableOutput, Update, XofReader},
+    Shake128, Shake128ReaderCore,
+};
 
 // Very silly first attempt at a class
 
-#[pyclass(name="Shake128_pyo3")]
+#[pyclass(name = "Shake128_pyo3")]
 struct Shake128Py {
-    xof: XofReaderCoreWrapper<Shake128ReaderCore>
+    xof: XofReaderCoreWrapper<Shake128ReaderCore>,
 }
 
 #[pymethods]
@@ -35,7 +37,8 @@ impl Shake128Py {
 fn pyo3_shake_128(py: Python, input_bytes: &[u8], n: usize) -> PyObject {
     let mut hasher = Shake128::default();
     hasher.update(input_bytes);
-    let mut xof: sha3::digest::core_api::XofReaderCoreWrapper<sha3::Shake128ReaderCore> = hasher.finalize_xof();
+    let mut xof: sha3::digest::core_api::XofReaderCoreWrapper<sha3::Shake128ReaderCore> =
+        hasher.finalize_xof();
     let mut res = vec![0u8; n];
     xof.read(&mut res);
     PyBytes::new_bound(py, &res).into()
