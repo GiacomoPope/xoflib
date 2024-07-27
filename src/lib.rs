@@ -1,74 +1,23 @@
-use pyo3::{prelude::*, types::PyBytes};
+use pyo3::{exceptions::PyValueError, prelude::*, types::PyBytes};
 use sha3::{
     digest::{
-        core_api::XofReaderCoreWrapper, crypto_common::BlockSizeUser, ExtendableOutput,
+        core_api::{CoreWrapper, XofReaderCoreWrapper},
         ExtendableOutputReset, Update, XofReader,
     },
-    Shake128, Shake128ReaderCore, Shake256, Shake256ReaderCore,
+    Shake128, Shake128ReaderCore, Shake256, Shake256ReaderCore, TurboShake128, TurboShake128Core,
+    TurboShake128ReaderCore, TurboShake256, TurboShake256Core, TurboShake256ReaderCore,
 };
 
-// Very silly first attempt at a class
-
-#[pyclass(name = "Shake128_pyo3")]
-struct Shake128Py {
-    xof: XofReaderCoreWrapper<Shake128ReaderCore>,
-}
-
-#[pymethods]
-impl Shake128Py {
-    #[new]
-    fn init(input_bytes: &[u8]) -> Self {
-        let mut hasher = Shake128::default();
-        hasher.update(input_bytes);
-        let xof: XofReaderCoreWrapper<sha3::Shake128ReaderCore> = hasher.finalize_xof();
-        Self { xof }
-    }
-
-    fn read<'py>(&mut self, py: Python<'py>, n: usize) -> PyResult<Bound<'py, PyBytes>> {
-        PyBytes::new_bound_with(py, n, |bytes| Ok(self.xof.read(bytes)))
-    }
-}
-
-// Some simple functions used for testing
-
-/// Returns the first n bytes of Shake128 initialized with
-/// input_bytes
-#[pyfunction]
-fn pyo3_shake_128<'py>(
-    py: Python<'py>,
-    input_bytes: &[u8],
-    n: usize,
-) -> PyResult<pyo3::Bound<'py, PyBytes>> {
-    let mut hasher = Shake128::default();
-    hasher.update(input_bytes);
-    let mut xof: sha3::digest::core_api::XofReaderCoreWrapper<sha3::Shake128ReaderCore> =
-        hasher.finalize_xof();
-    PyBytes::new_bound_with(py, n, |bytes: &mut [u8]| Ok(xof.read(bytes)))
-}
-
-/// Returns the first n bytes of Shake128 initialized with
-/// input_bytes
-#[pyfunction]
-fn pyo3_shake_128_one_block<'py>(
-    py: Python<'py>,
-    input_bytes: &[u8],
-) -> PyResult<Bound<'py, PyBytes>> {
-    pyo3_shake_128_n_blocks(py, input_bytes, 1)
-}
-
-/// Returns the first n bytes of Shake128 initialized with
-/// input_bytes
-#[pyfunction]
-fn pyo3_shake_128_n_blocks<'py>(
-    py: Python<'py>,
-    input_bytes: &[u8],
-    n: usize,
-) -> PyResult<Bound<'py, PyBytes>> {
-    pyo3_shake_128(py, input_bytes, n * Shake128::block_size())
-}
-
 macro_rules! impl_sponge_shaker_classes {
-    ($hasher:ident, $xof_reader:ident, $shaker_name:ident, $sponge_name:ident) => {
+    // hasher is tt so we can pick the right kind of methods to generate
+    ($hasher:tt, $xof_reader:ident, $shaker_name:ident, $sponge_name:ident) => {
+        #[pyclass]
+        struct $shaker_name {
+            hasher: $hasher,
+        }
+
+        impl_sponge_shaker_classes!(@shaker_methods $hasher, $shaker_name, $sponge_name);
+
         #[pyclass]
         struct $sponge_name {
             xof: XofReaderCoreWrapper<$xof_reader>,
@@ -91,12 +40,58 @@ macro_rules! impl_sponge_shaker_classes {
                 self.__repr__()
             }
         }
+    };
 
-        #[pyclass]
-        struct $shaker_name {
-            hasher: $hasher,
+    // "match" on the TurboShakes and generate a unique __init__ for them with domain separation
+    (@shaker_methods TurboShake128, $shaker_name:ident, $sponge_name:ident) => {
+        impl_sponge_shaker_classes!(@turbo_shaker_methods TurboShake128Core, $shaker_name, $sponge_name);
+    };
+
+    (@shaker_methods TurboShake256, $shaker_name:ident, $sponge_name:ident) => {
+        impl_sponge_shaker_classes!(@turbo_shaker_methods TurboShake256Core, $shaker_name, $sponge_name);
+    };
+
+    (@turbo_shaker_methods $hasher_core:ident, $shaker_name:ident, $sponge_name:ident) => {
+        #[pymethods]
+        impl $shaker_name {
+            #[new]
+            #[pyo3(signature = (domain_sep, input_bytes = None))]
+            fn new(domain_sep: u8, input_bytes: Option<&[u8]>) -> PyResult<Self> {
+                if !(0x01..=0x7F).contains(&domain_sep) {
+                    return Err(PyValueError::new_err("domain sep is not in range(1, 0x80)"))
+                }
+
+                let mut hasher = CoreWrapper::from_core($hasher_core::new(domain_sep));
+                if let Some(initial_data) = input_bytes {
+                    hasher.update(initial_data);
+                }
+
+                Ok(Self { hasher })
+            }
+
+            fn absorb(&mut self, input_bytes: &[u8]) {
+                self.hasher.update(input_bytes);
+            }
+
+            fn finalize(&mut self) -> $sponge_name {
+                $sponge_name {
+                    xof: self.hasher.finalize_xof_reset(),
+                }
+            }
+
+            fn __repr__(&self) -> String {
+                String::from(stringify!($shaker_name))
+            }
+
+            fn __str__(&self) -> String {
+                self.__repr__()
+            }
         }
+    };
 
+    // I would love to be more specific with the template but annoyingly you cannot use a macro in
+    // a #[pymethods] block to define methods :(
+    (@shaker_methods $hasher:ident, $shaker_name:ident, $sponge_name:ident) => {
         #[pymethods]
         impl $shaker_name {
             #[new]
@@ -132,20 +127,30 @@ macro_rules! impl_sponge_shaker_classes {
 
 impl_sponge_shaker_classes!(Shake128, Shake128ReaderCore, Shaker128, Sponge128);
 impl_sponge_shaker_classes!(Shake256, Shake256ReaderCore, Shaker256, Sponge256);
+impl_sponge_shaker_classes!(
+    TurboShake128,
+    TurboShake128ReaderCore,
+    TurboShaker128,
+    TurboSponge128
+);
+impl_sponge_shaker_classes!(
+    TurboShake256,
+    TurboShake256ReaderCore,
+    TurboShaker256,
+    TurboSponge256
+);
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn xof_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(pyo3_shake_128, m)?)?;
-    m.add_function(wrap_pyfunction!(pyo3_shake_128_one_block, m)?)?;
-    m.add_function(wrap_pyfunction!(pyo3_shake_128_n_blocks, m)?)?;
-
-    m.add_class::<Shake128Py>()?;
-
+fn xof(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Sponge128>()?;
     m.add_class::<Shaker128>()?;
     m.add_class::<Sponge256>()?;
     m.add_class::<Shaker256>()?;
+    m.add_class::<TurboSponge128>()?;
+    m.add_class::<TurboShaker128>()?;
+    m.add_class::<TurboSponge256>()?;
+    m.add_class::<TurboShaker256>()?;
 
     Ok(())
 }
