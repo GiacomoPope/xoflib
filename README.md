@@ -27,7 +27,7 @@ maturin develop --release
 You should now be able to use the package:
 
 ```py
->>> from xof_py import pyo3_shake_128
+>>> from xof import pyo3_shake_128
 >>> pyo3_shake_128(b"cryptohack", 100).hex()
 '8d043455562ebedd1b3fcf5b0e0a058091752d161e7eef40364a565aacb3b5d3bbefa804de6087e77c4c211ef57ab83869e3e18627f8421540ae9a8b61da847d0da513c56c5feba397ab2b4a1a2ef67c6f17162c8dfdb41901ad70bca8195fd35bcea259'
 ```

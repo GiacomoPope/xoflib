@@ -4,7 +4,7 @@ xof\_py package
 Module contents
 ---------------
 
-.. automodule:: xof_py
+.. automodule:: xof
    :members:
    :undoc-members:
    :show-inheritance:
