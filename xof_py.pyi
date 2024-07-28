@@ -1,21 +1,27 @@
+class Shaker128:
+    def __init__(self, input_bytes: bytes | None = None):
+        ...
+
+    def absorb(self, input_bytes: bytes) -> None:
+        ...
+
+    def finalize(self) -> Sponge128:
+        ...
+
 class Sponge128:
-    def read(n: int) -> bytes:
+    def read(self, n: int) -> bytes:
         ...
 
-class Shake128:
-    def absorb(input_bytes: bytes) -> None:
+class Shaker256:
+    def __init__(self, input_bytes: bytes | None = None):
         ...
 
-    def finalize() -> Sponge128:
+    def absorb(self, input_bytes: bytes) -> None:
+        ...
+
+    def finalize(self) -> Sponge128:
         ...
 
 class Sponge256:
-    def read(n: int) -> bytes:
-        ...
-
-class Shake256:
-    def absorb(input_bytes: bytes) -> None:
-        ...
-
-    def finalize() -> Sponge256:
+    def read(self, n: int) -> bytes:
         ...
