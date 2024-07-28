@@ -70,10 +70,12 @@ macro_rules! impl_sponge_shaker_classes {
                 Ok(Self { hasher })
             }
 
+            /// This should be the absorb one...
             fn absorb(&mut self, input_bytes: &[u8]) {
                 self.hasher.update(input_bytes);
             }
 
+            /// This should be the finalize one...
             fn finalize(&mut self) -> $sponge_name {
                 $sponge_name {
                     xof: self.hasher.finalize_xof_reset(),
@@ -105,7 +107,7 @@ macro_rules! impl_sponge_shaker_classes {
                 }
                 Self { hasher }
             }
-            
+
             /// This should be the absorb one...
             fn absorb(&mut self, input_bytes: &[u8]) {
                 self.hasher.update(input_bytes);
