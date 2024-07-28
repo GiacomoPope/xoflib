@@ -1,5 +1,11 @@
 # xof-py
 
+
+## Documentation
+
+https://xof-py.readthedocs.io/en/latest/generated/xof.html
+
+
 ## Building with Maturin
 
 - https://pyo3.rs/v0.22.2/
