@@ -12,6 +12,7 @@ macro_rules! impl_sponge_shaker_classes {
     // hasher is tt so we can pick the right kind of methods to generate
     ($hasher:tt, $xof_reader:ident, $shaker_name:ident, $sponge_name:ident) => {
         #[pyclass(module="xof_py")]
+        #[doc=concat!(stringify!($shaker_name), " implements absorption and finalization for the ", stringify!($hasher), " XOF")]
         struct $shaker_name {
             hasher: $hasher,
         }
@@ -19,13 +20,14 @@ macro_rules! impl_sponge_shaker_classes {
         impl_sponge_shaker_classes!(@shaker_methods $hasher, $shaker_name, $sponge_name);
 
         #[pyclass(module="xof_py")]
+        #[doc=concat!(stringify!($sponge_name), " implements sponge expansion for the ", stringify!($hasher), " XOF")]
         struct $sponge_name {
             xof: XofReaderCoreWrapper<$xof_reader>,
         }
 
         #[pymethods]
         impl $sponge_name {
-            /// Docstring for the read??
+            #[doc=concat!("Read `n` bytes of data from the ", stringify!($hasher), " XOF")]
             fn read<'py>(&mut self, py: Python<'py>, n: usize) -> PyResult<Bound<'py, PyBytes>> {
                 PyBytes::new_bound_with(py, n, |bytes| {
                     self.xof.read(bytes);
@@ -70,12 +72,16 @@ macro_rules! impl_sponge_shaker_classes {
                 Ok(Self { hasher })
             }
 
-            /// This should be the absorb one...
+            #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher), " state")]
             fn absorb(&mut self, input_bytes: &[u8]) {
                 self.hasher.update(input_bytes);
             }
 
-            /// This should be the finalize one...
+            #[doc=concat!(
+                "Finalize the ", stringify!($hasher), " XOF into a sponge for expansion\n",
+                "\n",
+                "This method also resets the state, allowing more data to be absorbed.",
+            )]
             fn finalize(&mut self) -> $sponge_name {
                 $sponge_name {
                     xof: self.hasher.finalize_xof_reset(),
@@ -99,7 +105,6 @@ macro_rules! impl_sponge_shaker_classes {
         impl $shaker_name {
             #[new]
             #[pyo3(signature = (input_bytes = None))]
-            /// Here is some docstrings...
             fn new(input_bytes: Option<&[u8]>) -> Self {
                 let mut hasher = $hasher::default();
                 if let Some(initial_data) = input_bytes {
@@ -108,12 +113,16 @@ macro_rules! impl_sponge_shaker_classes {
                 Self { hasher }
             }
 
-            /// This should be the absorb one...
+            #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher), " state")]
             fn absorb(&mut self, input_bytes: &[u8]) {
                 self.hasher.update(input_bytes);
             }
 
-            /// This should be the finalize one...
+            #[doc=concat!(
+                "Finalize the ", stringify!($hasher), " XOF into a sponge for expansion\n",
+                "\n",
+                "This method also resets the state, allowing more data to be absorbed.",
+            )]
             fn finalize(&mut self) -> $sponge_name {
                 $sponge_name {
                     xof: self.hasher.finalize_xof_reset(),
