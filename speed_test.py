@@ -1,6 +1,6 @@
 import random
 from hashlib import shake_128
-from xof_py import Shaker128
+from xof import Shaker128
 import time
 import os
 from Crypto.Hash.SHAKE128 import SHAKE128_XOF

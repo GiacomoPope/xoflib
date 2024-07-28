@@ -51,11 +51,5 @@ class TurboShaker256:
         ...
 
 class TurboSponge256:
-    """
-    Can you do doc strings here?
-    """
     def read(self, n: int) -> bytes:
-        """
-        Or here?
-        """
         ...
