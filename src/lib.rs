@@ -11,14 +11,14 @@ use sha3::{
 macro_rules! impl_sponge_shaker_classes {
     // hasher is tt so we can pick the right kind of methods to generate
     ($hasher:tt, $xof_reader:ident, $shaker_name:ident, $sponge_name:ident) => {
-        #[pyclass]
+        #[pyclass(module="xof_py")]
         struct $shaker_name {
             hasher: $hasher,
         }
 
         impl_sponge_shaker_classes!(@shaker_methods $hasher, $shaker_name, $sponge_name);
 
-        #[pyclass]
+        #[pyclass(module="xof_py")]
         struct $sponge_name {
             xof: XofReaderCoreWrapper<$xof_reader>,
         }
