@@ -9,5 +9,5 @@ name = "xof_py"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.21.0", features = ["gil-refs"] }
+pyo3 = { version = "0.21.0" }
 sha3 = "0.10.8"
