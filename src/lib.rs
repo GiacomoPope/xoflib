@@ -72,13 +72,13 @@ macro_rules! impl_sponge_shaker_classes {
                 Ok(Self { hasher })
             }
 
-            #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher), " state")]
+            #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher_core), " state")]
             fn absorb(&mut self, input_bytes: &[u8]) {
                 self.hasher.update(input_bytes);
             }
 
             #[doc=concat!(
-                "Finalize the ", stringify!($hasher), " XOF into a sponge for expansion\n",
+                "Finalize the ", stringify!($hasher_core), " XOF into a sponge for expansion\n",
                 "\n",
                 "This method also resets the state, allowing more data to be absorbed.",
             )]
