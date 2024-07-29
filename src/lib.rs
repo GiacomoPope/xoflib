@@ -1,4 +1,4 @@
-use pyo3::{exceptions::PyValueError, prelude::*, types::PyBytes};
+use pyo3::{buffer::PyBuffer, exceptions::PyValueError, prelude::*, types::PyBytes};
 use sha3::{
     digest::{
         core_api::{CoreWrapper, XofReaderCoreWrapper},
@@ -7,6 +7,13 @@ use sha3::{
     Shake128, Shake128ReaderCore, Shake256, Shake256ReaderCore, TurboShake128, TurboShake128Core,
     TurboShake128ReaderCore, TurboShake256, TurboShake256Core, TurboShake256ReaderCore,
 };
+
+fn pybuffer_get_bytes<'py>(data: &Bound<'py, PyAny>) -> PyResult<&'py [u8]> {
+    let buf = PyBuffer::<u8>::get_bound(data)?;
+
+    // SAFETY: we hold the GIL so it is safe to access data via buffer.buf_ptr
+    Ok(unsafe { std::slice::from_raw_parts(buf.buf_ptr() as *const _, buf.len_bytes()) })
+}
 
 macro_rules! impl_sponge_shaker_classes {
     // hasher is tt so we can pick the right kind of methods to generate
@@ -59,22 +66,23 @@ macro_rules! impl_sponge_shaker_classes {
         impl $shaker_name {
             #[new]
             #[pyo3(signature = (domain_sep, input_bytes = None))]
-            fn new(domain_sep: u8, input_bytes: Option<&[u8]>) -> PyResult<Self> {
+            fn new(domain_sep: u8, input_bytes: Option<&Bound<'_, PyAny>>) -> PyResult<Self> {
                 if !(0x01..=0x7F).contains(&domain_sep) {
                     return Err(PyValueError::new_err("domain sep is not in range(1, 0x80)"))
                 }
 
                 let mut hasher = CoreWrapper::from_core($hasher_core::new(domain_sep));
                 if let Some(initial_data) = input_bytes {
-                    hasher.update(initial_data);
+                    hasher.update(pybuffer_get_bytes(initial_data)?);
                 }
 
                 Ok(Self { hasher })
             }
 
             #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher_core), " state")]
-            fn absorb(&mut self, input_bytes: &[u8]) {
-                self.hasher.update(input_bytes);
+            fn absorb(&mut self, input_bytes: &Bound<'_, PyAny>) -> PyResult<()> {
+                self.hasher.update(pybuffer_get_bytes(input_bytes)?);
+                Ok(())
             }
 
             #[doc=concat!(
@@ -105,17 +113,18 @@ macro_rules! impl_sponge_shaker_classes {
         impl $shaker_name {
             #[new]
             #[pyo3(signature = (input_bytes = None))]
-            fn new(input_bytes: Option<&[u8]>) -> Self {
+            fn new(input_bytes: Option<&Bound<'_, PyAny>>) -> PyResult<Self> {
                 let mut hasher = $hasher::default();
                 if let Some(initial_data) = input_bytes {
-                    hasher.update(initial_data);
+                    hasher.update(pybuffer_get_bytes(initial_data)?);
                 }
-                Self { hasher }
+                Ok(Self { hasher })
             }
 
             #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher), " state")]
-            fn absorb(&mut self, input_bytes: &[u8]) {
-                self.hasher.update(input_bytes);
+            fn absorb(&mut self, input_bytes: &Bound<'_, PyAny>) -> PyResult<()> {
+                self.hasher.update(pybuffer_get_bytes(input_bytes)?);
+                Ok(())
             }
 
             #[doc=concat!(
@@ -175,25 +184,25 @@ impl_sponge_shaker_classes!(
 
 /// Construct a Sponge128 directly from `data`
 #[pyfunction]
-fn shake128(data: &[u8]) -> Sponge128 {
-    Shaker128::new(Some(data)).finalize()
+fn shake128(data: &Bound<'_, PyAny>) -> PyResult<Sponge128> {
+    Ok(Shaker128::new(Some(data))?.finalize())
 }
 
 /// Construct a Sponge256 directly from `data`
 #[pyfunction]
-fn shake256(data: &[u8]) -> Sponge256 {
-    Shaker256::new(Some(data)).finalize()
+fn shake256(data: &Bound<'_, PyAny>) -> PyResult<Sponge256> {
+    Ok(Shaker256::new(Some(data))?.finalize())
 }
 
 /// Construct a TurboSponge128 directly from `domain_sep` and `data`
 #[pyfunction]
-fn turbo_shake128(domain_sep: u8, data: &[u8]) -> PyResult<TurboSponge128> {
+fn turbo_shake128(domain_sep: u8, data: &Bound<'_, PyAny>) -> PyResult<TurboSponge128> {
     Ok(TurboShaker128::new(domain_sep, Some(data))?.finalize())
 }
 
 /// Construct a TurboSponge256 directly from `domain_sep` and `data`
 #[pyfunction]
-fn turbo_shake256(domain_sep: u8, data: &[u8]) -> PyResult<TurboSponge256> {
+fn turbo_shake256(domain_sep: u8, data: &Bound<'_, PyAny>) -> PyResult<TurboSponge256> {
     Ok(TurboShaker256::new(domain_sep, Some(data))?.finalize())
 }
 

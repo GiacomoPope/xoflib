@@ -1,6 +1,7 @@
 from hashlib import shake_128, shake_256
 from xoflib import Shake128, Shake256, shake128, shake256, TurboShake128, TurboShake256, turbo_shake128, turbo_shake256
 import unittest
+from collections.abc import Buffer
 
 
 class TestShakeHashlib(unittest.TestCase):
@@ -33,6 +34,18 @@ class TestShakeHashlib(unittest.TestCase):
         self.hashlib_test_long_calls(Shake256, shake256, shake_256)
         self.hashlib_test_many_calls(Shake256, shake256, shake_256)
 
+    def accept_buffer_api(self, Shake, shake, shake_hashlib, data: Buffer):
+        xof1 = Shake(data).finalize()
+        xof2 = shake(data)
+        correct = shake_hashlib(data).digest(100)
+        self.assertEqual(xof1.read(100), correct)
+        self.assertEqual(xof2.read(100), correct)
+
+    def test_all_accept_buffer_api(self):
+        self.accept_buffer_api(Shake128, shake128, shake_128, bytearray(b"bytearrays support __buffer__"))
+        self.accept_buffer_api(Shake256, shake256, shake_256, bytearray(b"bytearrays support __buffer__"))
+
+
 class TestTurboShakeHashlib(unittest.TestCase):
     def turbo_shake(self, TurboShake, turbo_shake):
         xof_1 = TurboShake(1, b"testing turbo shake").finalize()
@@ -53,13 +66,22 @@ class TestTurboShakeHashlib(unittest.TestCase):
         # domain sep must be larger than 0
         self.assertRaises(ValueError, lambda: TurboShake128(0))
         self.assertRaises(ValueError, lambda: TurboShake256(0))
-        
+
         # domain sep must be smaller than 128
         self.assertRaises(ValueError, lambda: TurboShake128(128))
         self.assertRaises(ValueError, lambda: TurboShake256(128))
-        
+
     def test_turboshake_128(self):
         self.turbo_shake(TurboShake128, turbo_shake128)
 
     def test_turboshake_256(self):
         self.turbo_shake(TurboShake256, turbo_shake256)
+
+    def accept_buffer_api(self, Shake, shake, data: Buffer):
+        xof1 = Shake(1, data).finalize()
+        xof2 = shake(1, data)
+        self.assertEqual(xof1.read(100), xof2.read(100))
+
+    def test_all_accept_buffer_api(self):
+        self.accept_buffer_api(TurboShake128, turbo_shake128, bytearray(b"bytearrays support __buffer__"))
+        self.accept_buffer_api(TurboShake256, turbo_shake256, bytearray(b"bytearrays support __buffer__"))
