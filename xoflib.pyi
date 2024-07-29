@@ -1,4 +1,9 @@
-from collections.abc import Buffer
+import sys
+
+if sys.version_info >= (3, 12):
+    from collections.abc import Buffer
+else:
+    Buffer = bytes | bytearray | memoryview
 
 class Shake128:
     def __init__(self, input_bytes: Buffer | None = None):

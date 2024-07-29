@@ -1,7 +1,12 @@
 from hashlib import shake_128, shake_256
 from xoflib import Shake128, Shake256, shake128, shake256, TurboShake128, TurboShake256, turbo_shake128, turbo_shake256
 import unittest
-from collections.abc import Buffer
+
+import sys
+if sys.version_info >= (3, 12):
+    from collections.abc import Buffer
+else:
+    Buffer = bytes | bytearray | memoryview
 
 
 class TestShakeHashlib(unittest.TestCase):
