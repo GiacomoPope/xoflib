@@ -173,21 +173,25 @@ impl_sponge_shaker_classes!(
     rust_sponge_name = TurboSponge256
 );
 
+/// Construct a Sponge128 directly from `data`
 #[pyfunction]
 fn shake128(data: &[u8]) -> Sponge128 {
     Shaker128::new(Some(data)).finalize()
 }
 
+/// Construct a Sponge256 directly from `data`
 #[pyfunction]
 fn shake256(data: &[u8]) -> Sponge256 {
     Shaker256::new(Some(data)).finalize()
 }
 
+/// Construct a TurboSponge128 directly from `domain_sep` and `data`
 #[pyfunction]
 fn turbo_shake128(domain_sep: u8, data: &[u8]) -> PyResult<TurboSponge128> {
     Ok(TurboShaker128::new(domain_sep, Some(data))?.finalize())
 }
 
+/// Construct a TurboSponge256 directly from `domain_sep` and `data`
 #[pyfunction]
 fn turbo_shake256(domain_sep: u8, data: &[u8]) -> PyResult<TurboSponge256> {
     Ok(TurboShaker256::new(domain_sep, Some(data))?.finalize())
