@@ -1,0 +1,3 @@
+.rst-content div[class^=highlight] div[class^=highlight], .rst-content pre.literal-block div[class^=highlight] {
+    border-radius: 3px;
+}

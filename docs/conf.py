@@ -41,6 +41,15 @@ intersphinx_mapping = {"Python": ("https://docs.python.org/", None)}
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'lightbulb'
 
+# These folders are copied to the documentation's HTML output
+html_static_path = ['_static']
+
+# These paths are either relative to html_static_path
+# or fully qualified paths (eg. https://...)
+html_css_files = [
+    'css/custom.css',
+]
+
 autodoc_default_options = {
     "undoc-members": True,
     "inherited-members": True,
