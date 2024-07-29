@@ -5,21 +5,23 @@ import time
 import os
 from Crypto.Hash.SHAKE128 import SHAKE128_XOF
 
-for _ in range(100):
-    absorb = os.urandom(32)
-    n = random.randint(1, 1000)
-    a = shake_128(absorb).digest(n)
-    b = Shaker128(absorb).finalize().read(n)
-    assert a == b
+def test_single_read():
+    for _ in range(100):
+        absorb = os.urandom(32)
+        n = random.randint(1, 1000)
+        a = shake_128(absorb).digest(n)
+        b = Shaker128(absorb).finalize().read(n)
+        assert a == b
 
-for _ in range(3):
-    absorb = os.urandom(32)
-    xof1 = Shaker128(absorb).finalize()
-    xof2 = Shaker128(absorb).finalize()
-    a = shake_128(absorb).digest(100_000)
-    b = b"".join(xof1.read(1) for _ in range(100_000))
-    c = xof2.read(100_000)
-    assert a == b == c
+def test_many_reads():
+    for _ in range(3):
+        absorb = os.urandom(32)
+        xof1 = Shaker128(absorb).finalize()
+        xof2 = Shaker128(absorb).finalize()
+        a = shake_128(absorb).digest(100_000)
+        b = b"".join(xof1.read(1) for _ in range(100_000))
+        c = xof2.read(100_000)
+        assert a == b == c
 
 random.seed(0)
 t0 = time.time()
