@@ -8,7 +8,6 @@ if sys.version_info >= (3, 12):
 else:
     Buffer = bytes | bytearray | memoryview
 
-
 class TestShakeHashlib(unittest.TestCase):
     def hashlib_test_long_calls(self, Shake, shake, shake_hashlib):
         absorb_bytes = b"testing_shake_long"
