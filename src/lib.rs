@@ -10,8 +10,8 @@ use sha3::{
 
 macro_rules! impl_sponge_shaker_classes {
     // hasher is tt so we can pick the right kind of methods to generate
-    ($hasher:tt, $xof_reader:ident, $shaker_name:ident, $sponge_name:ident) => {
-        #[pyclass(module="xoflib")]
+    ($hasher:tt, $class_name:literal, $xof_reader:ident, $shaker_name:ident, $sponge_name:ident) => {
+        #[pyclass(module="xoflib", name=$class_name)]
         #[doc=concat!(stringify!($shaker_name), " implements absorption and finalization for the ", stringify!($hasher), " XOF")]
         struct $shaker_name {
             hasher: $hasher,
@@ -140,16 +140,30 @@ macro_rules! impl_sponge_shaker_classes {
     };
 }
 
-impl_sponge_shaker_classes!(Shake128, Shake128ReaderCore, Shaker128, Sponge128);
-impl_sponge_shaker_classes!(Shake256, Shake256ReaderCore, Shaker256, Sponge256);
+impl_sponge_shaker_classes!(
+    Shake128,
+    "Shake128",
+    Shake128ReaderCore,
+    Shaker128,
+    Sponge128
+);
+impl_sponge_shaker_classes!(
+    Shake256,
+    "Shake256",
+    Shake256ReaderCore,
+    Shaker256,
+    Sponge256
+);
 impl_sponge_shaker_classes!(
     TurboShake128,
+    "TurboShake128",
     TurboShake128ReaderCore,
     TurboShaker128,
     TurboSponge128
 );
 impl_sponge_shaker_classes!(
     TurboShake256,
+    "TurboShake256",
     TurboShake256ReaderCore,
     TurboShaker256,
     TurboSponge256
