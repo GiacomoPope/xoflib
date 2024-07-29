@@ -11,7 +11,7 @@ use sha3::{
 macro_rules! impl_sponge_shaker_classes {
     // hasher is tt so we can pick the right kind of methods to generate
     ($hasher:tt, $xof_reader:ident, $shaker_name:ident, $sponge_name:ident) => {
-        #[pyclass(module="xof")]
+        #[pyclass(module="xoflib")]
         #[doc=concat!(stringify!($shaker_name), " implements absorption and finalization for the ", stringify!($hasher), " XOF")]
         struct $shaker_name {
             hasher: $hasher,
@@ -19,7 +19,7 @@ macro_rules! impl_sponge_shaker_classes {
 
         impl_sponge_shaker_classes!(@shaker_methods $hasher, $shaker_name, $sponge_name);
 
-        #[pyclass(module="xof")]
+        #[pyclass(module="xoflib")]
         #[doc=concat!(stringify!($sponge_name), " implements sponge expansion for the ", stringify!($hasher), " XOF")]
         struct $sponge_name {
             xof: XofReaderCoreWrapper<$xof_reader>,
