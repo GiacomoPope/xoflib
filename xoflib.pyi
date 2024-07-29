@@ -9,7 +9,7 @@ class Shake128:
     def __init__(self, input_bytes: Buffer | None = None):
         ...
 
-    def absorb(self, input_bytes: Buffer) -> None:
+    def absorb(self, input_bytes: Buffer) -> "Shake128":
         ...
 
     def finalize(self) -> Sponge128:
@@ -23,7 +23,7 @@ class Shake256:
     def __init__(self, input_bytes: Buffer | None = None):
         ...
 
-    def absorb(self, input_bytes: Buffer) -> None:
+    def absorb(self, input_bytes: Buffer) -> "Shake256":
         ...
 
     def finalize(self) -> Sponge128:
@@ -37,7 +37,7 @@ class TurboShake128:
     def __init__(self, domain_sep: int, input_bytes: Buffer | None = None):
         ...
 
-    def absorb(self, input_bytes: Buffer) -> None:
+    def absorb(self, input_bytes: Buffer) -> "TurboShake128":
         ...
 
     def finalize(self) -> Sponge128:
@@ -51,7 +51,7 @@ class TurboShake256:
     def __init__(self, domain_sep: int, input_bytes: Buffer | None = None):
         ...
 
-    def absorb(self, input_bytes: Buffer) -> None:
+    def absorb(self, input_bytes: Buffer) -> "TurboShake256":
         ...
 
     def finalize(self) -> Sponge128:
