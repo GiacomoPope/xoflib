@@ -155,7 +155,9 @@ impl_sponge_shaker_classes!(
     TurboSponge256
 );
 
-/// A Python module implemented in Rust.
+/// A Python package for the Shake extendable-output functions (XOFs): Shake128,
+/// Shake256 and the turbo variants built with pyO3 bindings to the sha3 Rust
+/// crate.
 #[pymodule]
 fn xof(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Sponge128>()?;

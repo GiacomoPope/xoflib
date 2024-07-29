@@ -1,4 +1,4 @@
-xof\_py package
+xof package
 =================
 
 Module contents

@@ -10,13 +10,5 @@ Welcome to xof's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   api
+   xof
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

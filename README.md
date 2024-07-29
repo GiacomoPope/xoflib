@@ -4,7 +4,28 @@
 
 # xof-py
 
-## Example
+A Python package for the Shake extendable-output functions (XOFs): Shake128,
+Shake256 and the turbo variants. Built using
+[pyO3](https://github.com/PyO3/pyo3) bindings for the
+[`sha3`](https://docs.rs/sha3/latest/sha3/) crate.
+
+### Motivation
+
+For most hashing needs, the `hashlib` module is appropriate. However, the
+package maintainers have 
+[decided to not support Shake as an XOF](https://github.com/python/cpython/issues/82198) 
+and simply treat it as another hash with digest. This means that if a user reads
+`n` bytes and then wishes for the next `m` bytes of output, they must generate
+`n + m` bytes from a `digest()` call and then slice the output for the last `m`
+bytes.
+
+This can be an issue for cryptographic protocols, such as the post-quantum
+protocols ML-KEM (Kyber) and ML-DSA (Dilithium), which rely on Shake128 and
+Shake256 to continuously read bytes for rejection sampling.
+
+The purpose of this package is to implement XOF for their intended use case, with `absorb()`, `finalize()` and `read()` methods, which allow for the correct instantiation of the XOF as well as efficient sampling of bytes.
+
+## Example Usage
 
 ```py
 >>> from xof import Shaker128
@@ -17,13 +38,13 @@
 
 ## Tests
 
-Could be expanded, currently just check random tests against hashlib
+There is currently partial coverage for testing the bindings in `tests/`. The `sha3` crate which we bind to is thoroughly tested.
 
 ## Documentation
 
 https://xof-py.readthedocs.io/
 
-## Benchmark
+## Rough Benchmark
 
 ```
 10_000 calls with xof library: 0.014042854309082031
@@ -35,3 +56,5 @@ https://xof-py.readthedocs.io/
 100_000 block reads xof library: 0.5895988941192627
 100_000 block reads pycryptodome: 1.635364055633545
 ```
+
+For more information, see the file [`benchmarks/benchmark_xof.py`](benchmarks/benchmark_xof.py).
