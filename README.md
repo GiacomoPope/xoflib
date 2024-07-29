@@ -1,6 +1,6 @@
-[![License MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/GiacomoPope/xof-py/blob/main/LICENSE)
-[![GitHub CI](https://github.com/GiacomoPope/xof-py/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/GiacomoPope/xof-py/actions/workflows/ci.yml)
-[![Documentation Status](https://readthedocs.org/projects/xof-py/badge/?version=latest)](https://xof-py.readthedocs.io/en/latest/?badge=latest)
+[![License MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/GiacomoPope/xoflib/blob/main/LICENSE)
+[![GitHub CI](https://github.com/GiacomoPope/xoflib/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/GiacomoPope/xoflib/actions/workflows/ci.yml)
+[![Documentation Status](https://readthedocs.org/projects/xoflib/badge/?version=latest)](https://xoflib.readthedocs.io/en/latest/?badge=latest)
 
 # xoflib
 
