@@ -183,7 +183,6 @@ impl_sponge_shaker_classes!(
 ///    >>> xof = shake128(b"bytes to absorb")
 ///    >>> xof.read(16).hex()
 ///    '250ef380a0f0c92e9506af9893f640fa'
-/// ```
 #[pyfunction]
 fn shake128(data: &[u8]) -> Sponge128 {
     Shaker128::new(Some(data)).finalize()
@@ -199,7 +198,6 @@ fn shake128(data: &[u8]) -> Sponge128 {
 ///    >>> xof = shake256(b"bytes to absorb")
 ///    >>> xof.read(16).hex()
 ///    '1e54f9f0cbacb3573a05dd5d48ea4104'
-/// ```
 #[pyfunction]
 fn shake256(data: &[u8]) -> Sponge256 {
     Shaker256::new(Some(data)).finalize()
@@ -215,7 +213,6 @@ fn shake256(data: &[u8]) -> Sponge256 {
 ///    >>> xof = turbo_shake128(1, b"bytes to absorb")
 ///    >>> xof.read(16).hex()
 ///    '4bb4e35b21335fcc6ae6cd3d0a5fe005'
-/// ```
 #[pyfunction]
 fn turbo_shake128(domain_sep: u8, data: &[u8]) -> PyResult<TurboSponge128> {
     Ok(TurboShaker128::new(domain_sep, Some(data))?.finalize())
@@ -231,7 +228,6 @@ fn turbo_shake128(domain_sep: u8, data: &[u8]) -> PyResult<TurboSponge128> {
 ///    >>> xof = turbo_shake256(1, b"bytes to absorb")
 ///    >>> xof.read(16).hex()
 ///    'd671d0021e9f22293d062259e68e6e89'
-/// ```
 #[pyfunction]
 fn turbo_shake256(domain_sep: u8, data: &[u8]) -> PyResult<TurboSponge256> {
     Ok(TurboShaker256::new(domain_sep, Some(data))?.finalize())
