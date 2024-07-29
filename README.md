@@ -73,20 +73,59 @@ https://xoflib.readthedocs.io/
 
 ## Rough Benchmark
 
+We find that `xoflib` performs equally with `hashlib` and is faster than `pycryptodome`.
+
+`xoflib` has the additional memory cost benefit as calling `c` bytes to be read from our XOF `n` times only needs `c` bytes of memory for each call, where as `hashlib` requires the potentially colossal amount of `n * c` bytes of memory which are then iterated over.
+
+We include two timings for `hashlib` -- one naive where `n * c` bytes are requested and iterated over slicing over bytes and a second which uses a wrapper by David Buchanan
+[from this comment](https://github.com/pyca/cryptography/issues/9185#issuecomment-1868518432) which helps with the API but has the same memory usage issues.
+
+All times are derived by timing the computation of `c_0 ^ c_1 ^ ... c_(n-1)` for `n` chunks of `c` bytes:
+
+```py
+def benchmark_xof(shake, absorb, c, n):
+    xof = shake(absorb).finalize()
+    res = bytes([0] * c)
+    for _ in range(n):
+        chunk = xof.read(c)
+        res = xor_bytes(res, chunk)
+    return res
 ```
-10_000 calls (read(1, 500)) with xoflib: 0.014404773712158203
-10_000 calls (read(1, 500)) with hashlib: 0.02388787269592285
-10_000 calls (read(1, 500)) with pycryptodome: 0.028993844985961914
---------------------------------------------------------------------------------
-1_000_000 single byte reads with xoflib: 0.16383790969848633
-1_000_000 single byte reads pycryptodome: 1.172316312789917
-100_000 block reads with xoflib: 0.6025588512420654
-100_000 block reads pycryptodome: 1.6401760578155518
---------------------------------------------------------------------------------
-10_000 calls (read(1, 5000)) with xoflib Shake128: 0.07348895072937012
-10_000 calls (read(1, 5000)) with xoflib Shaker256: 0.08775138854980469
-10_000 calls (read(1, 5000)) with xoflib TurboShaker128: 0.04633498191833496
-10_000 calls (read(1, 5000)) with xoflib TurboShaker256: 0.056485891342163086
+
+```
+================================================================================
+Benchmarking Shake128: 
+================================================================================
+Requesting 1 bytes from XOF 10000 times
+xoflib: 0.71s
+hashlib (single call): 0.66s
+hashlib (streaming): 0.88s
+pycryptodome: 2.12s
+================================================================================
+Requesting 100 bytes from XOF 10000 times
+xoflib: 8.67s
+hashlib (single call): 7.69s
+hashlib (streaming): 10.06s
+pycryptodome: 11.15s
+================================================================================
+Requesting 1000 bytes from XOF 1000 times
+xoflib: 6.77s
+hashlib (single call): 6.62s
+hashlib (streaming): 7.22s
+pycryptodome: 6.33s
+================================================================================
+Requesting 10000 bytes from XOF 1000 times
+xoflib: 6.32s
+hashlib (single call): 6.37s
+hashlib (streaming): 6.51s
+pycryptodome: 6.45s
+================================================================================
+Requesting 32 bytes from XOF 100000 times
+xoflib: 2.80s
+hashlib (single call): 2.69s
+hashlib (streaming): 2.95s
+pycryptodome: 4.04s
+================================================================================
 ```
 
 For more information, see the file [`benchmarks/benchmark_xof.py`](benchmarks/benchmark_xof.py).
