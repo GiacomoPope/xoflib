@@ -102,38 +102,37 @@ def benchmark_xof(shake, absorb, c, n):
 
 ```
 ================================================================================
-Benchmarking Shake128: 
+ Benchmarking Shake256: 
 ================================================================================
 Requesting 1 bytes from XOF 10000 times
-xoflib: 0.71s
-hashlib (single call): 0.66s
-hashlib (streaming): 0.88s
-pycryptodome: 2.12s
-================================================================================
+xoflib: 0.69s
+hashlib (single call): 0.65s
+hashlib (streaming): 0.82s
+pycryptodome: 1.82s
+
 Requesting 100 bytes from XOF 10000 times
-xoflib: 8.67s
-hashlib (single call): 7.69s
-hashlib (streaming): 10.06s
-pycryptodome: 11.15s
-================================================================================
+xoflib: 6.65s
+hashlib (single call): 6.57s
+hashlib (streaming): 6.98s
+pycryptodome: 7.83s
+
 Requesting 1000 bytes from XOF 1000 times
-xoflib: 6.77s
-hashlib (single call): 6.62s
-hashlib (streaming): 7.22s
-pycryptodome: 6.33s
-================================================================================
+xoflib: 6.05s
+hashlib (single call): 5.90s
+hashlib (streaming): 6.15s
+pycryptodome: 6.15s
+
 Requesting 10000 bytes from XOF 1000 times
-xoflib: 6.32s
-hashlib (single call): 6.37s
-hashlib (streaming): 6.51s
-pycryptodome: 6.45s
-================================================================================
+xoflib: 5.82s
+hashlib (single call): 5.77s
+hashlib (streaming): 6.37s
+pycryptodome: 5.85s
+
 Requesting 32 bytes from XOF 100000 times
-xoflib: 2.80s
-hashlib (single call): 2.69s
-hashlib (streaming): 2.95s
-pycryptodome: 4.04s
-================================================================================
+xoflib: 2.71s
+hashlib (single call): 2.63s
+hashlib (streaming): 2.89s
+pycryptodome: 3.83s
 ```
 
 For more information, see the file [`benchmarks/benchmark_xof.py`](benchmarks/benchmark_xof.py).
