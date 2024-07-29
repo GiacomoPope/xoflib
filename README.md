@@ -18,6 +18,10 @@ We currently have pyO3 bindings for the four XOF available in the `sha3` crate:
 - `TurboShake128`
 - `TurboShake256`
 
+### Documentation
+
+For more detailed documentation see the [`xoflib` package documentation](https://xoflib.readthedocs.io/en/latest/xoflib.html)
+
 ### Example Usage
 
 For the `Shake128` and `Shake256` XOF, the intended usage is to first define a `shake` object, which is then finalized to product the XOF or Sponge:
@@ -48,6 +52,7 @@ The `TurboShake128` and `TurboShake256` XOFs additionally require a domain separ
 ```
 
 Sponges can also be constructed directly:
+
 ```py
 >>> from xoflib import shake128, Shake128
 >>> sponge1 = Shaker128(b"a new XOF library").finalize()
@@ -73,15 +78,11 @@ The purpose of this package is to implement XOF for their intended use case, wit
 
 ## Tests
 
-There is currently partial coverage for testing the bindings in `tests/`. The `sha3` crate which we bind to is thoroughly tested.
+We rely on the testing of the `sha3` crate for correctness of the Shake implementations. For API testing and consistency with `hashlib` we include some unittests for the XOFs exposed in our module: [tests/test_xoflib.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_xoflib.py)
 
-## Documentation
+## Rough Benchmarking
 
-https://xoflib.readthedocs.io/
-
-## Rough Benchmark
-
-We find that `xoflib` performs equally with `hashlib` and is faster than `pycryptodome`.
+We find that `xoflib` performs equally with `hashlib` and is faster than the XOFs available `pycryptodome`.
 
 `xoflib` has the additional memory cost benefit as calling `c` bytes to be read from our XOF `n` times only needs `c` bytes of memory for each call, where as `hashlib` requires the potentially colossal amount of `n * c` bytes of memory which are then iterated over.
 
@@ -135,4 +136,4 @@ hashlib (streaming): 2.89s
 pycryptodome: 3.83s
 ```
 
-For more information, see the file [`benchmarks/benchmark_xof.py`](benchmarks/benchmark_xof.py).
+For more information, see the file [`benchmarks/benchmark_xof.py`](https://github.com/GiacomoPope/xoflib/blob/main/benchmarks/benchmark_xof.py).
