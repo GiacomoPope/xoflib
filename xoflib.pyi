@@ -1,4 +1,4 @@
-class Shaker128:
+class Shake128:
     def __init__(self, input_bytes: bytes | None = None):
         ...
 
@@ -12,7 +12,7 @@ class Sponge128:
     def read(self, n: int) -> bytes:
         ...
 
-class Shaker256:
+class Shake256:
     def __init__(self, input_bytes: bytes | None = None):
         ...
 

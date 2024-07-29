@@ -1,4 +1,4 @@
-from hashlib import shake_128
+from hashlib import shake_128, shake_256
 
 class ShakeStream:
 	"""	
@@ -23,3 +23,6 @@ class ShakeStream:
 	
 def shake_128_hashlib(absorb):
 	return ShakeStream(shake_128(absorb).digest)
+
+def shake_256_hashlib(absorb):
+	return ShakeStream(shake_256(absorb).digest)
