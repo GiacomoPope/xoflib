@@ -1,5 +1,5 @@
 from hashlib import shake_128, shake_256
-from xoflib import Shaker128, Shaker256
+from xoflib import Shake128, Shake256
 import unittest
 
 
@@ -18,9 +18,9 @@ class TestShakeHashlib(unittest.TestCase):
             self.assertEqual(shake_hashlib(absorb_bytes).digest(l), output)
 
     def test_hashlib_shake128(self):
-        self.hashlib_test_long_calls(Shaker128, shake_128)
-        self.hashlib_test_many_calls(Shaker128, shake_128)
+        self.hashlib_test_long_calls(Shake128, shake_128)
+        self.hashlib_test_many_calls(Shake128, shake_128)
 
     def test_hashlib_shake256(self):
-        self.hashlib_test_long_calls(Shaker256, shake_256)
-        self.hashlib_test_many_calls(Shaker256, shake_256)
+        self.hashlib_test_long_calls(Shake256, shake_256)
+        self.hashlib_test_many_calls(Shake256, shake_256)
