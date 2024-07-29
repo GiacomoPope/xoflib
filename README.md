@@ -23,8 +23,8 @@ We currently have pyO3 bindings for the four XOF available in the `sha3` crate:
 For the `Shake128` and `Shake256` XOF, the intended usage is to first define a `shake` object, which is then finalized to product the XOF or Sponge:
 
 ```py
->>> from xoflib import Shaker128
->>> shake128 = Shaker128(b"a new XOF library")
+>>> from xoflib import Shake128
+>>> shake128 = Shake128(b"a new XOF library")
 >>> shake128.absorb(b"written using pyO3 bindings")
 >>> xof = shake128.finalize()
 >>> xof.read(16).hex()
@@ -36,9 +36,9 @@ For the `Shake128` and `Shake256` XOF, the intended usage is to first define a `
 The `TurboShake128` and `TurboShake256` XOFs additionally require a domain separation:
 
 ```py
->>> from xoflib import TurboShaker256
+>>> from xoflib import TurboShake256
 >>> domain_sep = 123 # should be between (1, 127)
->>> turbo256 = TurboShaker256(domain_sep)
+>>> turbo256 = TurboShake256(domain_sep)
 >>> turbo256.absorb(b"Turbo mode")
 >>> xof = turbo256.finalize()
 >>> xof.read(16).hex()
@@ -84,9 +84,9 @@ https://xoflib.readthedocs.io/
 100_000 block reads pycryptodome: 1.6401760578155518
 --------------------------------------------------------------------------------
 10_000 calls (read(1, 5000)) with xoflib Shake128: 0.07348895072937012
-10_000 calls (read(1, 5000)) with xoflib Shaker256: 0.08775138854980469
-10_000 calls (read(1, 5000)) with xoflib TurboShaker128: 0.04633498191833496
-10_000 calls (read(1, 5000)) with xoflib TurboShaker256: 0.056485891342163086
+10_000 calls (read(1, 5000)) with xoflib Shake256: 0.08775138854980469
+10_000 calls (read(1, 5000)) with xoflib TurboShake128: 0.04633498191833496
+10_000 calls (read(1, 5000)) with xoflib TurboShake256: 0.056485891342163086
 ```
 
 For more information, see the file [`benchmarks/benchmark_xof.py`](benchmarks/benchmark_xof.py).
