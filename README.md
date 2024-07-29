@@ -47,6 +47,14 @@ The `TurboShake128` and `TurboShake256` XOFs additionally require a domain separ
 '5aa0168bc689e89a35111d43842de214'
 ```
 
+Sponges can also be constructed directly:
+```py
+>>> from xoflib import shake128, Shake128
+>>> sponge1 = Shaker128(b"a new XOF library").finalize()
+>>> sponge2 = shake128(b"a new XOF library")
+>>> assert sponge1.read(10) == sponge2.read(10)
+```
+
 ### Motivation
 
 For most hashing needs, the `hashlib` module is appropriate. However, the
