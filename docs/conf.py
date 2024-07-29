@@ -38,6 +38,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = "sphinx_rtd_theme"
 intersphinx_mapping = {"Python": ("https://docs.python.org/", None)}
 
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = 'lightbulb'
+
 autodoc_default_options = {
     "undoc-members": True,
     "inherited-members": True,
