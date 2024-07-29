@@ -13,10 +13,10 @@ Shake256 and the turbo variants. Built using
 
 We currently have pyO3 bindings for the four XOF available in the `sha3` crate:
 
-- `Shake128`
-- `Shake256`
-- `TurboShake128`
-- `TurboShake256`
+- [`Shake128`](https://xoflib.readthedocs.io/en/latest/xoflib.html#xoflib.Shake128)
+- [`Shake256`](https://xoflib.readthedocs.io/en/latest/xoflib.html#xoflib.Shake256)
+- [`TurboShake128`](https://xoflib.readthedocs.io/en/latest/xoflib.html#xoflib.TurboShake128)
+- [`TurboShake256`](https://xoflib.readthedocs.io/en/latest/xoflib.html#xoflib.TurboShake256)
 
 ### Documentation
 
