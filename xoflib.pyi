@@ -26,7 +26,7 @@ class Sponge256:
     def read(self, n: int) -> bytes:
         ...
 
-class TurboShaker128:
+class TurboShake128:
     def __init__(self, domain_sep: int, input_bytes: bytes | None = None):
         ...
 
@@ -40,7 +40,7 @@ class TurboSponge128:
     def read(self, n: int) -> bytes:
         ...
 
-class TurboShaker256:
+class TurboShake256:
     def __init__(self, domain_sep: int, input_bytes: bytes | None = None):
         ...
 
