@@ -9,5 +9,5 @@ name = "xoflib"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.21.0" }
-sha3 = "0.10.8"
+pyo3 = "0.21.0"
+sha3 = { version = "0.10.8", features = ["asm"] }
