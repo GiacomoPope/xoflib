@@ -12,5 +12,4 @@ xoflib documentation
 
    xoflib
 
-```{include} ../README.md
-```
+readme
