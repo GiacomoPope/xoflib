@@ -1,4 +1,4 @@
-xof package
+xoflib package
 =================
 
 Module contents
