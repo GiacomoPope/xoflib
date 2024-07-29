@@ -2,7 +2,7 @@ from hashlib import shake_128
 from xoflib import Shaker128, Shaker256, TurboShaker128, TurboShaker256
 from timeit import timeit
 from Crypto.Hash.SHAKE128 import SHAKE128_XOF
-
+from shake_wrapper import shake_128_hashlib
 
 def xor_bytes(a, b):
     return bytes(i ^ j for i, j in zip(a, b))
@@ -34,8 +34,9 @@ def benchmark_hashlib_stream(absorb, c, n):
     Requests only the bytes needed, but requires n calls to the digest
     """
     res = bytes([0] * c)
-    for i in range(n):
-        chunk = shake_128(absorb).digest((i + 1) * c)[-c : ]
+    xof = shake_128_hashlib(absorb)
+    for _ in range(n):
+        chunk = xof.read(c)
         res = xor_bytes(res, chunk)
     return res
 
@@ -57,7 +58,7 @@ d = benchmark_pycryptodome_stream(b"benchmarking...", 123, 1000)
 assert a == b == c == d
 
 print("="*80)
-for (c, n) in [(1, 10_000), (100, 10_000), (1000, 1000), (10_000, 1000), (32, 1_000_000)]:
+for (c, n) in [(1, 10_000), (100, 10_000), (1000, 1000), (10_000, 1000), (32, 100_000)]:
     print(f"Requesting {c} bytes from XOF {n} times")
     xoflib_time = timeit(
         'benchmark_xoflib_stream(b"benchmarking...", c, n)',
@@ -73,13 +74,12 @@ for (c, n) in [(1, 10_000), (100, 10_000), (1000, 1000), (10_000, 1000), (32, 1_
     )
     print(f"hashlib (single call): {hashlib_single_time:.2f}s")
 
-    # TOO slow and annoying to benchmark
-    # hashlib_stream_time = timeit(
-    #     'benchmark_hashlib_stream(b"benchmarking...", c, n)',
-    #     globals={"benchmark_hashlib_stream": benchmark_hashlib_stream, "c" : c, "n" : n},
-    #     number = 10
-    # )
-    # print(f"hashlib (streaming): {hashlib_stream_time:.2f}s")
+    hashlib_stream_time = timeit(
+        'benchmark_hashlib_stream(b"benchmarking...", c, n)',
+        globals={"benchmark_hashlib_stream": benchmark_hashlib_stream, "c" : c, "n" : n},
+        number = 10
+    )
+    print(f"hashlib (streaming): {hashlib_stream_time:.2f}s")
 
     pycryptodome_time = timeit(
         'benchmark_pycryptodome_stream(b"benchmarking...", c, n)',
