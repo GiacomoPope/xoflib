@@ -23,8 +23,8 @@ We currently have pyO3 bindings for the four XOF available in the `sha3` crate:
 For the `Shake128` and `Shake256` XOF, the intended usage is to first define a `shake` object, which is then finalized to product the XOF or Sponge:
 
 ```py
->>> from xoflib import Shaker128
->>> shake128 = Shaker128(b"a new XOF library")
+>>> from xoflib import Shake128
+>>> shake128 = Shake128(b"a new XOF library")
 >>> shake128.absorb(b"written using pyO3 bindings")
 >>> xof = shake128.finalize()
 >>> xof.read(16).hex()
@@ -36,15 +36,23 @@ For the `Shake128` and `Shake256` XOF, the intended usage is to first define a `
 The `TurboShake128` and `TurboShake256` XOFs additionally require a domain separation:
 
 ```py
->>> from xoflib import TurboShaker256
+>>> from xoflib import TurboShake256
 >>> domain_sep = 123 # should be between (1, 127)
->>> turbo256 = TurboShaker256(domain_sep)
+>>> turbo256 = TurboShake256(domain_sep)
 >>> turbo256.absorb(b"Turbo mode")
 >>> xof = turbo256.finalize()
 >>> xof.read(16).hex()
 '798984af20ecc1e9e593410c23f0fe67'
 >>> xof.read(16).hex()
 '5aa0168bc689e89a35111d43842de214'
+```
+
+Sponges can also be constructed directly:
+```py
+>>> from xoflib import shake128, Shake128
+>>> sponge1 = Shaker128(b"a new XOF library").finalize()
+>>> sponge2 = shake128(b"a new XOF library")
+>>> assert sponge1.read(10) == sponge2.read(10)
 ```
 
 ### Motivation

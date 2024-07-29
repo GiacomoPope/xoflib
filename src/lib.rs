@@ -173,6 +173,30 @@ impl_sponge_shaker_classes!(
     rust_sponge_name = TurboSponge256
 );
 
+/// Construct a Sponge128 directly from `data`
+#[pyfunction]
+fn shake128(data: &[u8]) -> Sponge128 {
+    Shaker128::new(Some(data)).finalize()
+}
+
+/// Construct a Sponge256 directly from `data`
+#[pyfunction]
+fn shake256(data: &[u8]) -> Sponge256 {
+    Shaker256::new(Some(data)).finalize()
+}
+
+/// Construct a TurboSponge128 directly from `domain_sep` and `data`
+#[pyfunction]
+fn turbo_shake128(domain_sep: u8, data: &[u8]) -> PyResult<TurboSponge128> {
+    Ok(TurboShaker128::new(domain_sep, Some(data))?.finalize())
+}
+
+/// Construct a TurboSponge256 directly from `domain_sep` and `data`
+#[pyfunction]
+fn turbo_shake256(domain_sep: u8, data: &[u8]) -> PyResult<TurboSponge256> {
+    Ok(TurboShaker256::new(domain_sep, Some(data))?.finalize())
+}
+
 /// A Python package for the Shake extendable-output functions (XOFs): Shake128,
 /// Shake256 and the turbo variants built with pyO3 bindings to the sha3 Rust
 /// crate.
@@ -186,6 +210,11 @@ fn xoflib(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<TurboShaker128>()?;
     m.add_class::<TurboSponge256>()?;
     m.add_class::<TurboShaker256>()?;
+
+    m.add_function(wrap_pyfunction!(shake128, m)?)?;
+    m.add_function(wrap_pyfunction!(shake256, m)?)?;
+    m.add_function(wrap_pyfunction!(turbo_shake128, m)?)?;
+    m.add_function(wrap_pyfunction!(turbo_shake256, m)?)?;
 
     Ok(())
 }

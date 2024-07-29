@@ -5,6 +5,7 @@ from Crypto.Hash.SHAKE128 import SHAKE128_XOF
 from Crypto.Hash.SHAKE256 import SHAKE256_XOF
 from shake_wrapper import shake_128_hashlib, shake_256_hashlib
 
+
 def xor_bytes(a, b):
     return bytes(i ^ j for i, j in zip(a, b))
 
@@ -94,6 +95,3 @@ for name, shakes in [("Shake128: ", (Shake128, shake_128, shake_128_hashlib, SHA
         )
         print(f"pycryptodome: {pycryptodome_time:.2f}s")
         print("="*80)
-
-
-
