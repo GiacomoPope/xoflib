@@ -159,7 +159,7 @@ impl_sponge_shaker_classes!(
 /// Shake256 and the turbo variants built with pyO3 bindings to the sha3 Rust
 /// crate.
 #[pymodule]
-fn xof(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn xoflib(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Sponge128>()?;
     m.add_class::<Shaker128>()?;
     m.add_class::<Sponge256>()?;

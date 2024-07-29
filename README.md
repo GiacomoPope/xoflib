@@ -2,7 +2,7 @@
 [![GitHub CI](https://github.com/GiacomoPope/xof-py/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/GiacomoPope/xof-py/actions/workflows/ci.yml)
 [![Documentation Status](https://readthedocs.org/projects/xof-py/badge/?version=latest)](https://xof-py.readthedocs.io/en/latest/?badge=latest)
 
-# xof-py
+# xoflib
 
 A Python package for the Shake extendable-output functions (XOFs): Shake128,
 Shake256 and the turbo variants. Built using
@@ -28,7 +28,7 @@ The purpose of this package is to implement XOF for their intended use case, wit
 ## Example Usage
 
 ```py
->>> from xof import Shaker128
+>>> from xoflib import Shaker128
 >>> Shake128 = Shaker128(b"a new XOF library").finalize()
 >>> Shake128.read(16).hex()
 'd071c7cdd2e2108ef8515922daf7e790913c1b75a9f8afd79b38f59d03ac52fe'
@@ -42,18 +42,18 @@ There is currently partial coverage for testing the bindings in `tests/`. The `s
 
 ## Documentation
 
-https://xof-py.readthedocs.io/
+https://xoflib.readthedocs.io/
 
 ## Rough Benchmark
 
 ```
-10_000 calls with xof library: 0.014042854309082031
+10_000 calls with xoflib: 0.014042854309082031
 10_000 calls with hashlib: 0.022047996520996094
 10_000 calls with pycryptodome: 0.029639005661010742
 --------------------------------------------------------------------------------
-1_000_000 single byte reads xof library: 0.18165993690490723
+1_000_000 single byte reads xoflib: 0.18165993690490723
 1_000_000 single byte reads pycryptodome: 1.1623139381408691
-100_000 block reads xof library: 0.5895988941192627
+100_000 block reads xoflib: 0.5895988941192627
 100_000 block reads pycryptodome: 1.635364055633545
 ```
 

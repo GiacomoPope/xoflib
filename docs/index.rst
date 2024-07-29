@@ -10,5 +10,5 @@ Welcome to xof's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   xof
+   xoflib
 

@@ -4,7 +4,7 @@ xof package
 Module contents
 ---------------
 
-.. automodule:: xof
+.. automodule:: xoflib
    :members:
    :undoc-members:
    :show-inheritance:

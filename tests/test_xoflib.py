@@ -1,5 +1,5 @@
 from hashlib import shake_128, shake_256
-from xof import Shaker128, Shaker256
+from xoflib import Shaker128, Shaker256
 import unittest
 
 

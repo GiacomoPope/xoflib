@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath("../"))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'xof-py'
+project = 'xoflib'
 copyright = '2024, Robin Jadoul, Sam Leonard, Giacomo Pope'
 author = 'Robin Jadoul, Sam Leonard, Giacomo Pope'
 release = '0.1'
