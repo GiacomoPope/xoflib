@@ -12,4 +12,5 @@ xoflib documentation
 
    xoflib
 
-.. mdinclude:: ../README.md
+```{include} ../README.md
+```
