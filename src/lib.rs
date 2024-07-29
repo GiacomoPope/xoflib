@@ -1,4 +1,9 @@
-use pyo3::{buffer::PyBuffer, exceptions::PyValueError, prelude::*, types::PyBytes};
+use pyo3::{
+    buffer::PyBuffer,
+    exceptions::{PyTypeError, PyValueError},
+    prelude::*,
+    types::PyBytes,
+};
 use sha3::{
     digest::{
         core_api::{CoreWrapper, XofReaderCoreWrapper},
@@ -13,6 +18,18 @@ fn pybuffer_get_bytes<'py>(data: &Bound<'py, PyAny>) -> PyResult<&'py [u8]> {
 
     // SAFETY: we hold the GIL so it is safe to access data via buffer.buf_ptr
     Ok(unsafe { std::slice::from_raw_parts(buf.buf_ptr() as *const _, buf.len_bytes()) })
+}
+
+fn pybuffer_get_bytes_mut<'py>(data: &Bound<'py, PyAny>) -> PyResult<&'py mut [u8]> {
+    let buf = PyBuffer::<u8>::get_bound(data)?;
+
+    // SAFETY PRECONDITION: Ensure the data area is mutable
+    if buf.readonly() {
+        return Err(PyTypeError::new_err("Cannot write into readonly object"));
+    }
+
+    // SAFETY: we hold the GIL so it is safe to access data via buffer.buf_ptr
+    Ok(unsafe { std::slice::from_raw_parts_mut(buf.buf_ptr() as *mut _, buf.len_bytes()) })
 }
 
 macro_rules! impl_sponge_shaker_classes {
@@ -40,6 +57,12 @@ macro_rules! impl_sponge_shaker_classes {
                     self.xof.read(bytes);
                     Ok(())
                 })
+            }
+
+            #[doc=concat!("Fill the input buffer with data from the ", stringify!($hasher), " XOF")]
+            fn read_into(&mut self, buf: &Bound<'_, PyAny>) -> PyResult<()> {
+                self.xof.read(pybuffer_get_bytes_mut(buf)?);
+                Ok(())
             }
 
             fn __repr__(&self) -> String {
