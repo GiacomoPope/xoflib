@@ -1,8 +1,15 @@
+import sys
+
+if sys.version_info >= (3, 12):
+    from collections.abc import Buffer
+else:
+    Buffer = bytes | bytearray | memoryview
+
 class Shake128:
-    def __init__(self, input_bytes: bytes | None = None):
+    def __init__(self, input_bytes: Buffer | None = None):
         ...
 
-    def absorb(self, input_bytes: bytes) -> None:
+    def absorb(self, input_bytes: Buffer) -> None:
         ...
 
     def finalize(self) -> Sponge128:
@@ -13,10 +20,10 @@ class Sponge128:
         ...
 
 class Shake256:
-    def __init__(self, input_bytes: bytes | None = None):
+    def __init__(self, input_bytes: Buffer | None = None):
         ...
 
-    def absorb(self, input_bytes: bytes) -> None:
+    def absorb(self, input_bytes: Buffer) -> None:
         ...
 
     def finalize(self) -> Sponge128:
@@ -27,10 +34,10 @@ class Sponge256:
         ...
 
 class TurboShake128:
-    def __init__(self, domain_sep: int, input_bytes: bytes | None = None):
+    def __init__(self, domain_sep: int, input_bytes: Buffer | None = None):
         ...
 
-    def absorb(self, input_bytes: bytes) -> None:
+    def absorb(self, input_bytes: Buffer) -> None:
         ...
 
     def finalize(self) -> Sponge128:
@@ -41,10 +48,10 @@ class TurboSponge128:
         ...
 
 class TurboShake256:
-    def __init__(self, domain_sep: int, input_bytes: bytes | None = None):
+    def __init__(self, domain_sep: int, input_bytes: Buffer | None = None):
         ...
 
-    def absorb(self, input_bytes: bytes) -> None:
+    def absorb(self, input_bytes: Buffer) -> None:
         ...
 
     def finalize(self) -> Sponge128:
@@ -54,14 +61,14 @@ class TurboSponge256:
     def read(self, n: int) -> bytes:
         ...
 
-def shake128(input_bytes: bytes) -> Sponge128:
+def shake128(input_bytes: Buffer) -> Sponge128:
     ...
 
-def shake256(input_bytes: bytes) -> Sponge256:
+def shake256(input_bytes: Buffer) -> Sponge256:
     ...
 
-def turbo_shake128(domain_sep: int, input_bytes: bytes) -> TurboSponge128:
+def turbo_shake128(domain_sep: int, input_bytes: Buffer) -> TurboSponge128:
     ...
 
-def turbo_shake256(domain_sep: int, input_bytes: bytes) -> TurboSponge256:
+def turbo_shake256(domain_sep: int, input_bytes: Buffer) -> TurboSponge256:
     ...
