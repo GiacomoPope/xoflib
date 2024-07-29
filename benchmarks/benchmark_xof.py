@@ -56,7 +56,6 @@ a = benchmark_xoflib_stream(Shake128, b"benchmarking...", 123, 1000)
 b = benchmark_hashlib_one_call(shake_128, b"benchmarking...", 123, 1000)
 c = benchmark_hashlib_stream(shake_128_hashlib, b"benchmarking...", 123, 1000)
 d = benchmark_pycryptodome_stream(SHAKE128_XOF(), b"benchmarking...", 123, 1000)
-
 assert a == b == c == d
 
 
