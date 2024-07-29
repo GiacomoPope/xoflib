@@ -10,7 +10,7 @@ use sha3::{
 
 macro_rules! impl_sponge_shaker_classes {
     // hasher is tt so we can pick the right kind of methods to generate
-    ($hasher:tt, $class_name:literal, $xof_reader:ident, $shaker_name:ident, $sponge_name:ident) => {
+    (hasher_name = $hasher:tt, pyclass_name = $class_name:literal, reader_name = $xof_reader:ident, rust_shaker_name = $shaker_name:ident, rust_sponge_name = $sponge_name:ident) => {
         #[pyclass(module="xoflib", name=$class_name)]
         #[doc=concat!(stringify!($shaker_name), " implements absorption and finalization for the ", stringify!($hasher), " XOF")]
         struct $shaker_name {
@@ -140,33 +140,37 @@ macro_rules! impl_sponge_shaker_classes {
     };
 }
 
+#[rustfmt::skip]
 impl_sponge_shaker_classes!(
-    Shake128,
-    "Shake128",
-    Shake128ReaderCore,
-    Shaker128,
-    Sponge128
+    hasher_name      = Shake128,
+    pyclass_name     = "Shake128",
+    reader_name      = Shake128ReaderCore,
+    rust_shaker_name = Shaker128,
+    rust_sponge_name = Sponge128
 );
+#[rustfmt::skip]
 impl_sponge_shaker_classes!(
-    Shake256,
-    "Shake256",
-    Shake256ReaderCore,
-    Shaker256,
-    Sponge256
+    hasher_name      = Shake256,
+    pyclass_name     = "Shake256",
+    reader_name      = Shake256ReaderCore,
+    rust_shaker_name = Shaker256,
+    rust_sponge_name = Sponge256
 );
+#[rustfmt::skip]
 impl_sponge_shaker_classes!(
-    TurboShake128,
-    "TurboShake128",
-    TurboShake128ReaderCore,
-    TurboShaker128,
-    TurboSponge128
+    hasher_name      = TurboShake128,
+    pyclass_name     = "TurboShake128",
+    reader_name      = TurboShake128ReaderCore,
+    rust_shaker_name = TurboShaker128,
+    rust_sponge_name = TurboSponge128
 );
+#[rustfmt::skip]
 impl_sponge_shaker_classes!(
-    TurboShake256,
-    "TurboShake256",
-    TurboShake256ReaderCore,
-    TurboShaker256,
-    TurboSponge256
+    hasher_name      = TurboShake256,
+    pyclass_name     = "TurboShake256",
+    reader_name      = TurboShake256ReaderCore,
+    rust_shaker_name = TurboShaker256,
+    rust_sponge_name = TurboSponge256
 );
 
 /// A Python package for the Shake extendable-output functions (XOFs): Shake128,
