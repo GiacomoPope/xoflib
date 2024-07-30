@@ -3,6 +3,22 @@
 version = 3
 
 [[package]]
+name = "ascon"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9fe9a0cff241855e9166670d259192aacf1e9a81b865dc9905afbbab31a9d2c1"
+
+[[package]]
+name = "ascon-hash"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d629b6e580029d416158998cf0ae2d355d68cde3ed25715549533b0de9fd90b6"
+dependencies = [
+ "ascon",
+ "digest",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -367,9 +383,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
-name = "xof"
-version = "0.1.0"
+name = "xoflib"
+version = "0.2.0"
 dependencies = [
+ "ascon-hash",
  "pyo3",
  "sha3",
 ]

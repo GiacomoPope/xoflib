@@ -1,3 +1,4 @@
+use ascon_hash::{AsconAXof, AsconAXofReaderCore, AsconXof, AsconXofReaderCore};
 use pyo3::{
     buffer::PyBuffer,
     exceptions::{PyTypeError, PyValueError},
@@ -34,7 +35,7 @@ fn pybuffer_get_bytes_mut<'py>(data: &Bound<'py, PyAny>) -> PyResult<&'py mut [u
 
 macro_rules! impl_sponge_shaker_classes {
     // hasher is tt so we can pick the right kind of methods to generate
-    (hasher_name = $hasher:tt, pyclass_name = $class_name:literal, reader_name = $xof_reader:ident, rust_shaker_name = $shaker_name:ident, rust_sponge_name = $sponge_name:ident) => {
+    (hasher_name = $hasher:tt, pyclass_name = $class_name:literal, reader_name = $xof_reader:ident, rust_shaker_name = $shaker_name:ident, rust_sponge_name = $sponge_name:ident $(,)?) => {
         #[pyclass(module="xoflib", name=$class_name)]
         #[doc=concat!(stringify!($shaker_name), " implements absorption and finalization for the ", stringify!($hasher), " XOF")]
         struct $shaker_name {
@@ -129,6 +130,14 @@ macro_rules! impl_sponge_shaker_classes {
 
     (@docs_example_hash TurboShake256) => {
         "'2e9d18d326438ea968b071ab958f6260'"
+    };
+
+    (@docs_example_hash AsconXof) => {
+        "'202e12280fb6781470016dc067d3b213'"
+    };
+
+    (@docs_example_hash AsconAXof) => {
+        "'e3d5593d0e08c5a7c6cbf751fb817f0a'"
     };
 
     // "match" on the TurboShakes and generate a unique __init__ for them with domain separation
@@ -301,35 +310,22 @@ impl_sponge_shaker_classes!(
     rust_sponge_name = TurboSponge256
 );
 
-/// Construct a Sponge128 directly from `data`
-///
-/// Example:
-///
-/// .. code-block:: python
-///
-///    >>> from xoflib import shake128
-///    >>> xof = shake128(b"bytes to absorb")
-///    >>> xof.read(16).hex()
-///    '250ef380a0f0c92e9506af9893f640fa'
-#[pyfunction]
-fn shake128(data: &Bound<'_, PyAny>) -> PyResult<Sponge128> {
-    Ok(Shaker128::new(Some(data))?.finalize())
-}
-
-/// Construct a Sponge256 directly from `data`
-///
-/// Example:
-///
-/// .. code-block:: python
-///
-///    >>> from xoflib import shake256
-///    >>> xof = shake256(b"bytes to absorb")
-///    >>> xof.read(16).hex()
-///    '1e54f9f0cbacb3573a05dd5d48ea4104'
-#[pyfunction]
-fn shake256(data: &Bound<'_, PyAny>) -> PyResult<Sponge256> {
-    Ok(Shaker256::new(Some(data))?.finalize())
-}
+#[rustfmt::skip]
+impl_sponge_shaker_classes!(
+    hasher_name      = AsconXof,
+    pyclass_name     = "AsconXof",
+    reader_name      = AsconXofReaderCore,
+    rust_shaker_name = Ascon,
+    rust_sponge_name = AsconSponge,
+);
+#[rustfmt::skip]
+impl_sponge_shaker_classes!(
+    hasher_name      = AsconAXof,
+    pyclass_name     = "AsconAXof",
+    reader_name      = AsconAXofReaderCore,
+    rust_shaker_name = AsconA,
+    rust_sponge_name = AsconASponge,
+);
 
 /// Construct a TurboSponge128 directly from `domain_sep` and `data`
 ///
@@ -361,6 +357,58 @@ fn turbo_shake256(domain_sep: u8, data: &Bound<'_, PyAny>) -> PyResult<TurboSpon
     Ok(TurboShaker256::new(domain_sep, Some(data))?.finalize())
 }
 
+#[rustfmt::skip]
+macro_rules! impl_sponge_constructor {
+    (function_name = $func_name:ident, xof = $xof:ident, sponge = $sponge:ident, example_hash = $example_hash:literal $(,)?) => {
+        #[doc=concat!(
+            "Construct a ", stringify!($sponge), " directly from `data`\n",
+            "\n",
+            "Example:\n",
+            "\n",
+            ".. code-block:: python\n",
+            "\n",
+            "   >>> from xoflib import ", stringify!($func_name), "\n",
+            "   >>> xof = ", stringify!($func_name), "(b\"bytes to absorb\")\n",
+            "   >>> xof.read(16).hex()\n",
+            "   '", $example_hash, "'\n",
+        )]
+        #[pyfunction]
+        fn $func_name(data: &Bound<'_, PyAny>) -> PyResult<$sponge> {
+            Ok($xof::new(Some(data))?.finalize())
+        }
+    };
+}
+
+#[rustfmt::skip]
+impl_sponge_constructor!(
+    function_name = shake128,
+    xof           = Shaker128,
+    sponge        = Sponge128,
+    example_hash  = "250ef380a0f0c92e9506af9893f640fa",
+);
+#[rustfmt::skip]
+impl_sponge_constructor!(
+    function_name = shake256,
+    xof           = Shaker256,
+    sponge        = Sponge256,
+    example_hash  = "1e54f9f0cbacb3573a05dd5d48ea4104"
+);
+
+#[rustfmt::skip]
+impl_sponge_constructor!(
+    function_name = ascon_xof,
+    xof           = Ascon,
+    sponge        = AsconSponge,
+    example_hash  = "d7bbe757e53015382e3ee13a2207fafc",
+);
+#[rustfmt::skip]
+impl_sponge_constructor!(
+    function_name = ascona_xof,
+    xof           = AsconA,
+    sponge        = AsconASponge,
+    example_hash  = "ae7ba96550a57300da1e2ba31335d922",
+);
+
 /// A Python package for the Shake extendable-output functions (XOFs): Shake128,
 /// Shake256 and the turbo variants built with pyO3 bindings to the sha3 Rust
 /// crate.
@@ -379,6 +427,14 @@ fn xoflib(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(shake256, m)?)?;
     m.add_function(wrap_pyfunction!(turbo_shake128, m)?)?;
     m.add_function(wrap_pyfunction!(turbo_shake256, m)?)?;
+
+    m.add_class::<Ascon>()?;
+    m.add_class::<AsconSponge>()?;
+    m.add_class::<AsconA>()?;
+    m.add_class::<AsconASponge>()?;
+
+    m.add_function(wrap_pyfunction!(ascon_xof, m)?)?;
+    m.add_function(wrap_pyfunction!(ascona_xof, m)?)?;
 
     Ok(())
 }
