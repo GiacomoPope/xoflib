@@ -41,7 +41,7 @@ macro_rules! impl_sponge_shaker_classes {
             hasher: $hasher,
         }
 
-        impl_sponge_shaker_classes!(@shaker_methods $hasher, $shaker_name, $sponge_name);
+        impl_sponge_shaker_classes!(@shaker_methods $hasher, $class_name, $shaker_name, $sponge_name);
 
         #[pyclass(module="xoflib")]
         #[doc=concat!(stringify!($sponge_name), " implements sponge expansion for the ", stringify!($hasher), " XOF")]
@@ -132,15 +132,15 @@ macro_rules! impl_sponge_shaker_classes {
     };
 
     // "match" on the TurboShakes and generate a unique __init__ for them with domain separation
-    (@shaker_methods TurboShake128, $shaker_name:ident, $sponge_name:ident) => {
-        impl_sponge_shaker_classes!(@turbo_shaker_methods TurboShake128Core, $shaker_name, $sponge_name);
+    (@shaker_methods TurboShake128, $class_name:literal, $shaker_name:ident, $sponge_name:ident) => {
+        impl_sponge_shaker_classes!(@turbo_shaker_methods TurboShake128Core, $class_name, $shaker_name, $sponge_name);
     };
 
-    (@shaker_methods TurboShake256, $shaker_name:ident, $sponge_name:ident) => {
-        impl_sponge_shaker_classes!(@turbo_shaker_methods TurboShake256Core, $shaker_name, $sponge_name);
+    (@shaker_methods TurboShake256, $class_name:literal, $shaker_name:ident, $sponge_name:ident) => {
+        impl_sponge_shaker_classes!(@turbo_shaker_methods TurboShake256Core, $class_name, $shaker_name, $sponge_name);
     };
 
-    (@turbo_shaker_methods $hasher_core:ident, $shaker_name:ident, $sponge_name:ident) => {
+    (@turbo_shaker_methods $hasher_core:ident, $class_name:literal, $shaker_name:ident, $sponge_name:ident) => {
         #[pymethods]
         impl $shaker_name {
             #[new]
@@ -158,7 +158,19 @@ macro_rules! impl_sponge_shaker_classes {
                 Ok(Self { hasher })
             }
 
-            #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher_core), " state")]
+            #[doc=concat!(
+                "Absorb `input_bytes` into the ", stringify!($hasher_core), " state\n",
+                "\n",
+                "Note: this method can be chained, i.e. .absorb().absorb()\n",
+                "\n",
+                "Example:\n",
+                "\n",
+                ".. code-block:: python\n",
+                "\n",
+                "   >>> from xoflib import ", $class_name, "\n",
+                "   >>> xof = ", $class_name, "(1, b\"Some initial data\")\n",
+                "   >>> xof.absorb(bytearray(b\"Ooh just a little bit more data\"))\n",
+            )]
             fn absorb<'py>(mut slf: PyRefMut<'py, Self>, input_bytes: &Bound<'py, PyAny>) -> PyResult<PyRefMut<'py, Self>> {
                 slf.hasher.update(pybuffer_get_bytes(input_bytes)?);
                 Ok(slf)
@@ -168,6 +180,14 @@ macro_rules! impl_sponge_shaker_classes {
                 "Finalize the ", stringify!($hasher_core), " XOF into a sponge for expansion\n",
                 "\n",
                 "This method also resets the state, allowing more data to be absorbed.",
+                "\n",
+                "Example:\n",
+                "\n",
+                ".. code-block:: python\n",
+                "\n",
+                "   >>> from xoflib import ", $class_name, "\n",
+                "   >>> xof = ", $class_name, "(1, b\"Some initial data\")\n",
+                "   >>> xof = xof.finalize()\n",
             )]
             fn finalize(&mut self) -> $sponge_name {
                 $sponge_name {
@@ -187,7 +207,7 @@ macro_rules! impl_sponge_shaker_classes {
 
     // I would love to be more specific with the template but annoyingly you cannot use a macro in
     // a #[pymethods] block to define methods :(
-    (@shaker_methods $hasher:ident, $shaker_name:ident, $sponge_name:ident) => {
+    (@shaker_methods $hasher:ident, $class_name:literal, $shaker_name:ident, $sponge_name:ident) => {
         #[pymethods]
         impl $shaker_name {
             #[new]
@@ -200,7 +220,19 @@ macro_rules! impl_sponge_shaker_classes {
                 Ok(Self { hasher })
             }
 
-            #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher), " state")]
+            #[doc=concat!(
+                "Absorb `input_bytes` into the ", stringify!($hasher), " state\n",
+                "\n",
+                "Note: this method can be chained, i.e. .absorb().absorb()\n",
+                "\n",
+                "Example:\n",
+                "\n",
+                ".. code-block:: python\n",
+                "\n",
+                "   >>> from xoflib import ", $class_name, "\n",
+                "   >>> xof = ", $class_name, "(b\"Some initial data\")\n",
+                "   >>> xof.absorb(bytearray(b\"Ooh just a little bit more data\"))\n",
+            )]
             fn absorb<'py>(mut slf: PyRefMut<'py, Self>, input_bytes: &Bound<'py, PyAny>) -> PyResult<PyRefMut<'py, Self>> {
                 slf.hasher.update(pybuffer_get_bytes(input_bytes)?);
                 Ok(slf)
@@ -210,6 +242,14 @@ macro_rules! impl_sponge_shaker_classes {
                 "Finalize the ", stringify!($hasher), " XOF into a sponge for expansion\n",
                 "\n",
                 "This method also resets the state, allowing more data to be absorbed.",
+                "\n",
+                "Example:\n",
+                "\n",
+                ".. code-block:: python\n",
+                "\n",
+                "   >>> from xoflib import ", $class_name, "\n",
+                "   >>> xof = ", $class_name, "(b\"Some initial data\")\n",
+                "   >>> xof = xof.finalize()\n",
             )]
             fn finalize(&mut self) -> $sponge_name {
                 $sponge_name {
