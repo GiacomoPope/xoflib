@@ -21,17 +21,20 @@ pip install xoflib
 
 We currently have pyO3 bindings for the four Shake XOF available in the [`sha3`](https://crates.io/crates/sha3) crate as well as the Ascon XOFs from the [`ascon-hash`](https://crates.io/crates/ascon-hash) crate.
 
-### Sha3
-
-- [Shake128()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.Shake128)
-- [Shake256()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.Shake256)
-- [TurboShake128()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.TurboShake128)
-- [TurboShake256()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.TurboShake256)
-
 ### Ascon
 
 - [AsconXof()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.AsconXof)
 - [AsconAXof()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.AsconAXof)
+
+### Sha3
+
+- [Shake128()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.Shake128)
+- [Shake256()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.Shake256)
+
+### TurboShake
+
+- [TurboShake128()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.TurboShake128)
+- [TurboShake256()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.TurboShake256)
 
 ### Documentation
 
@@ -93,14 +96,20 @@ The purpose of this package is to implement XOF for their intended use case, wit
 
 ## Tests
 
-### Sha3
-
-We rely on the testing of the `sha3` crate for correctness of the Shake implementations. For API testing and consistency with `hashlib` we include some unittests for the XOFs exposed in our module: [tests/test_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_shake.py)
-
 ### Ascon
 
-`AsconXOF` and `AsconAXof` are both tested by comparing the output with the KAT vectors generated from [`pyascon`](https://github.com/meichlseder/pyascon). For more information, see the test file: [tests/test_ascon.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_ascon.py)
+`AsconXOF` and `AsconAXof` are tested by comparing the output with the KAT vectors generated from [`pyascon`](https://github.com/meichlseder/pyascon). For more information, see the test file: [tests/test_ascon.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_ascon.py)
 
+### Sha3
+
+`Shake128` and `Shake256` are tested by comparing the output with the KAT vectors downloaded from the "SHA-3 XOF Test Vectors for Byte-Oriented Output" section from [Cryptographic Algorithm Validation Program (CAVP)](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/secure-hashing). For more information, see the test file: [tests/test_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_shake.py).
+
+### TurboShake
+
+`TurboShake128` and `TurboShake256` are tested by comparing the output with
+the IRTF CRFG examples [draft-irtf-cfrg-kangarootwelve-14](https://datatracker.ietf.org/doc/draft-irtf-cfrg-kangarootwelve/) from Section 5.
+For more information, see the test file:
+[tests/test_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_shake.py).
 
 ## Rough Benchmarking
 
