@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = "xoflib"
 requires-python = ">=3.9"
-description = "A package for the Shake extendable-output functions (XOFs)"
+description = "A package for the Shake and Ascon extendable-output functions (XOFs)"
 readme = "README.md"
 classifiers = [
     "Topic :: Security :: Cryptography",

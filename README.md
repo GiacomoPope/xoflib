@@ -4,10 +4,9 @@
 
 # xoflib
 
-A Python package for the Shake extendable-output functions (XOFs): Shake128,
-Shake256 and the turbo variants. Built using
+A Python package for the Shake and Ascon extendable-output functions (XOFs). Built using
 [pyO3](https://github.com/PyO3/pyo3) bindings for the
-[`sha3`](https://docs.rs/sha3/latest/sha3/) crate.
+[`sha3`](https://docs.rs/sha3/latest/sha3/) and [`ascon-hash`](https://crates.io/crates/ascon-hash) crates.
 
 ## Installation
 
@@ -20,12 +19,19 @@ pip install xoflib
 
 ## Algorithms
 
-We currently have pyO3 bindings for the four XOF available in the `sha3` crate:
+We currently have pyO3 bindings for the four Shake XOF available in the [`sha3`](https://crates.io/crates/sha3) crate as well as the Ascon XOFs from the [`ascon-hash`](https://crates.io/crates/ascon-hash) crate.
+
+### Sha3
 
 - [Shake128()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.Shake128)
 - [Shake256()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.Shake256)
 - [TurboShake128()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.TurboShake128)
 - [TurboShake256()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.TurboShake256)
+
+### Ascon
+
+- [AsconXof()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.AsconXof)
+- [AsconAXof()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.AsconAXof)
 
 ### Documentation
 
@@ -87,7 +93,14 @@ The purpose of this package is to implement XOF for their intended use case, wit
 
 ## Tests
 
-We rely on the testing of the `sha3` crate for correctness of the Shake implementations. For API testing and consistency with `hashlib` we include some unittests for the XOFs exposed in our module: [tests/test_xoflib.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_xoflib.py)
+### Sha3
+
+We rely on the testing of the `sha3` crate for correctness of the Shake implementations. For API testing and consistency with `hashlib` we include some unittests for the XOFs exposed in our module: [tests/test_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_shake.py)
+
+### Ascon
+
+`AsconXOF` and `AsconAXof` are both tested by comparing the output with the KAT vectors generated from [`pyascon`](https://github.com/meichlseder/pyascon). For more information, see the test file: [tests/test_ascon.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_ascon.py)
+
 
 ## Rough Benchmarking
 
