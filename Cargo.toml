@@ -9,5 +9,7 @@ name = "xoflib"
 crate-type = ["cdylib"]
 
 [dependencies]
+# TODO: Update when the fix lands
 pyo3 = "0.21.0"
 sha3 = { version = "0.10.8", features = ["asm"] }
+ascon-hash = "0.2.0"

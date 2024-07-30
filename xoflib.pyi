@@ -85,3 +85,43 @@ def turbo_shake128(domain_sep: int, input_bytes: Buffer) -> TurboSponge128:
 
 def turbo_shake256(domain_sep: int, input_bytes: Buffer) -> TurboSponge256:
     ...
+
+class AsconXof:
+    def __init__(self, input_bytes: Buffer | None = None):
+        ...
+
+    def absorb(self, input_bytes: Buffer) -> "AsconXof":
+        ...
+
+    def finalize(self) -> AsconSponge:
+        ...
+
+class AsconSponge:
+    def read(self, n: int) -> bytes:
+        ...
+
+    def read_into(self, buf: Buffer):
+        ...
+
+class AsconAXof:
+    def __init__(self, input_bytes: Buffer | None = None):
+        ...
+
+    def absorb(self, input_bytes: Buffer) -> "AsconAXof":
+        ...
+
+    def finalize(self) -> AsconSponge:
+        ...
+
+class AsconASponge:
+    def read(self, n: int) -> bytes:
+        ...
+
+    def read_into(self, buf: Buffer):
+        ...
+
+def ascon_xof(input_bytes: Buffer) -> AsconXof:
+    ...
+
+def ascona_xof(input_bytes: Buffer) -> AsconAXof:
+    ...
