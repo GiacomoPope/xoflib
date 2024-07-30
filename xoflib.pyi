@@ -20,6 +20,9 @@ class Sponge128:
     def read(self, n: int) -> bytes:
         ...
 
+    def read_into(self, buf: Buffer):
+        ...
+
 class Shake256:
     def __init__(self, input_bytes: Buffer | None = None):
         ...
@@ -32,6 +35,9 @@ class Shake256:
 
 class Sponge256:
     def read(self, n: int) -> bytes:
+        ...
+
+    def read_into(self, buf: Buffer):
         ...
 
 class TurboShake128:
@@ -48,6 +54,9 @@ class TurboSponge128:
     def read(self, n: int) -> bytes:
         ...
 
+    def read_into(self, buf: Buffer):
+        ...
+
 class TurboShake256:
     def __init__(self, domain_sep: int, input_bytes: Buffer | None = None):
         ...
@@ -60,6 +69,9 @@ class TurboShake256:
 
 class TurboSponge256:
     def read(self, n: int) -> bytes:
+        ...
+
+    def read_into(self, buf: Buffer):
         ...
 
 def shake128(input_bytes: Buffer) -> Sponge128:
