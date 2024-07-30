@@ -95,7 +95,7 @@ The purpose of this package is to implement XOF for their intended use case, wit
 
 ### Sha3
 
-We rely on the testing of the `sha3` crate for correctness of the Shake implementations. For API testing and consistency with `hashlib` we include some unittests for the XOFs exposed in our module: [tests/test_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_shake.py)
+`Shake128` and `Shake256` are both tested by comparing the output with the KAT vectors downloaded from the "SHA-3 XOF Test Vectors for Byte-Oriented Output" section from [Cryptographic Algorithm Validation Program (CAVP)](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/secure-hashing). For more information, see the test file: [tests/test_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_shake.py).
 
 ### Ascon
 
