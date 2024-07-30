@@ -22,14 +22,14 @@ pip install xoflib
 
 We currently have pyO3 bindings for the four XOF available in the `sha3` crate:
 
-- [Shake128()](https://xoflib.readthedocs.io/en/latest/xoflib.html#xoflib.Shake128)
-- [Shake256()](https://xoflib.readthedocs.io/en/latest/xoflib.html#xoflib.Shake256)
-- [TurboShake128()](https://xoflib.readthedocs.io/en/latest/xoflib.html#xoflib.TurboShake128)
-- [TurboShake256()](https://xoflib.readthedocs.io/en/latest/xoflib.html#xoflib.TurboShake256)
+- [Shake128()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.Shake128)
+- [Shake256()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.Shake256)
+- [TurboShake128()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.TurboShake128)
+- [TurboShake256()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.TurboShake256)
 
 ### Documentation
 
-For more detailed documentation see the [`xoflib` package documentation](https://xoflib.readthedocs.io/en/latest/xoflib.html)
+For more detailed documentation see the [`xoflib` package documentation](https://xoflib.readthedocs.io/en/stable/xoflib.html)
 
 ### Example Usage
 
