@@ -9,6 +9,15 @@ Shake256 and the turbo variants. Built using
 [pyO3](https://github.com/PyO3/pyo3) bindings for the
 [`sha3`](https://docs.rs/sha3/latest/sha3/) crate.
 
+## Installation
+
+This package is available as `xoflib` on
+[PyPI](https://pypi.org/project/xoflib/):
+
+```
+pip install xoflib
+```
+
 ## Algorithms
 
 We currently have pyO3 bindings for the four XOF available in the `sha3` crate:
