@@ -6,10 +6,6 @@ from xoflib import (
     Shake256,
     shake128,
     shake256,
-    TurboShake128,
-    TurboShake256,
-    turbo_shake128,
-    turbo_shake256,
 )
 
 import sys
@@ -55,7 +51,7 @@ class TestShakeKAT(unittest.TestCase):
 
     def shake_short_message(self, filename, shake):
         """
-        Parse the data from a long message KAT and
+        Parse the data from a short message KAT and
         ensure all values match
         """
         with open(filename) as f:
@@ -86,9 +82,9 @@ class TestShakeKAT(unittest.TestCase):
     def test_shake256_short_message(self):
         self.shake_short_message("tests/assets/shake/SHAKE256ShortMsg.rsp", shake256)
 
-    def shake_variable_message(self, filename, shake):
+    def shake_variable_output(self, filename, shake):
         """
-        Parse the data from a long message KAT and
+        Parse the data from the variable output KAT and
         ensure all values match
         """
         with open(filename) as f:
@@ -110,18 +106,21 @@ class TestShakeKAT(unittest.TestCase):
             self.assertEqual(len(out), out_len)
             self.assertEqual(out, shake(msg).read(out_len))
 
-    def test_shake128_variable_message(self):
-        self.shake_variable_message(
+    def test_shake128_variable_output(self):
+        self.shake_variable_output(
             "tests/assets/shake/SHAKE128VariableOut.rsp", shake128
         )
 
-    def test_shake256_variable_message(self):
-        self.shake_variable_message(
+    def test_shake256_variable_output(self):
+        self.shake_variable_output(
             "tests/assets/shake/SHAKE256VariableOut.rsp", shake256
         )
 
 
 class TestShakeMonteCarlo(unittest.TestCase):
+    """
+    Ensure that Shake XOF passes the KAT Monte Carlo test
+    """
     def monte_carlo(self, msg, minout_len, maxout_len, shake):
         minout_byte = minout_len // 8
         maxout_len = maxout_len // 8
@@ -132,7 +131,7 @@ class TestShakeMonteCarlo(unittest.TestCase):
         for _ in range(100):
             for i in range(1000):
                 msg = shake((msg + bytes(16))[:16]).read(output_len)
-                output_len = (msg[-2] << 8 | msg[-1]) % range_byte + minout_byte
+                output_len = int.from_bytes(msg[-2:]) % range_byte + minout_byte
             output_j.append(msg)
 
         return output_j
@@ -194,49 +193,4 @@ class TestShake(unittest.TestCase):
         )
         self.accept_buffer_api(
             Shake256, shake256, bytearray(b"bytearrays support __buffer__")
-        )
-
-
-class TestTurboShake(unittest.TestCase):
-    def turbo_shake(self, TurboShake, turbo_shake):
-        xof_1 = TurboShake(1, b"testing turbo shake").finalize()
-        xof_2 = TurboShake(127, b"testing turbo shake").finalize()
-        xof_3 = turbo_shake(1, b"testing turbo shake")
-
-        a = xof_1.read(10)
-        b = xof_2.read(10)
-        c = xof_3.read(10)
-
-        # Different domain sep mean bytes read don't match
-        self.assertNotEqual(a, b)
-
-        # Class or Function constructor is the same
-        self.assertEqual(a, c)
-
-    def test_turbo_domain_failure(self):
-        # domain sep must be larger than 0
-        self.assertRaises(ValueError, lambda: TurboShake128(0))
-        self.assertRaises(ValueError, lambda: TurboShake256(0))
-
-        # domain sep must be smaller than 128
-        self.assertRaises(ValueError, lambda: TurboShake128(128))
-        self.assertRaises(ValueError, lambda: TurboShake256(128))
-
-    def test_turboshake_128(self):
-        self.turbo_shake(TurboShake128, turbo_shake128)
-
-    def test_turboshake_256(self):
-        self.turbo_shake(TurboShake256, turbo_shake256)
-
-    def accept_buffer_api(self, Shake, shake, data: Buffer):
-        xof1 = Shake(1, data).finalize()
-        xof2 = shake(1, data)
-        self.assertEqual(xof1.read(100), xof2.read(100))
-
-    def test_all_accept_buffer_api(self):
-        self.accept_buffer_api(
-            TurboShake128, turbo_shake128, bytearray(b"bytearrays support __buffer__")
-        )
-        self.accept_buffer_api(
-            TurboShake256, turbo_shake256, bytearray(b"bytearrays support __buffer__")
         )
