@@ -109,7 +109,10 @@ The purpose of this package is to implement XOF for their intended use case, wit
 `TurboShake128` and `TurboShake256` are tested by comparing the output with
 the IRTF CRFG examples [draft-irtf-cfrg-kangarootwelve-14](https://datatracker.ietf.org/doc/draft-irtf-cfrg-kangarootwelve/) from Section 5.
 For more information, see the test file:
-[tests/test_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_shake.py).
+[tests/test_turbo_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_turbo_shake.py).
+
+**Note**: the test data from the draft-irtf-cfrg isn't very nice to parse, so it was copy pasted and hand-formatted into a more sensible data structure in 
+[tests/test_turbo_shake_data.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_turbo_shake_data.py).
 
 ## Rough Benchmarking
 
