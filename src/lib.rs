@@ -80,9 +80,9 @@ macro_rules! impl_sponge_shaker_classes {
             }
 
             #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher_core), " state")]
-            fn absorb(&mut self, input_bytes: &Bound<'_, PyAny>) -> PyResult<()> {
-                self.hasher.update(pybuffer_get_bytes(input_bytes)?);
-                Ok(())
+            fn absorb<'py>(mut slf: PyRefMut<'py, Self>, input_bytes: &Bound<'py, PyAny>) -> PyResult<PyRefMut<'py, Self>> {
+                slf.hasher.update(pybuffer_get_bytes(input_bytes)?);
+                Ok(slf)
             }
 
             #[doc=concat!(
@@ -122,9 +122,9 @@ macro_rules! impl_sponge_shaker_classes {
             }
 
             #[doc=concat!("Absorb `input_bytes` into the ", stringify!($hasher), " state")]
-            fn absorb(&mut self, input_bytes: &Bound<'_, PyAny>) -> PyResult<()> {
-                self.hasher.update(pybuffer_get_bytes(input_bytes)?);
-                Ok(())
+            fn absorb<'py>(mut slf: PyRefMut<'py, Self>, input_bytes: &Bound<'py, PyAny>) -> PyResult<PyRefMut<'py, Self>> {
+                slf.hasher.update(pybuffer_get_bytes(input_bytes)?);
+                Ok(slf)
             }
 
             #[doc=concat!(
@@ -184,10 +184,10 @@ impl_sponge_shaker_classes!(
 
 /// Construct a Sponge128 directly from `data`
 ///
-/// Example: 
-/// 
+/// Example:
+///
 /// .. code-block:: python
-/// 
+///
 ///    >>> from xoflib import shake128
 ///    >>> xof = shake128(b"bytes to absorb")
 ///    >>> xof.read(16).hex()
@@ -198,11 +198,11 @@ fn shake128(data: &Bound<'_, PyAny>) -> PyResult<Sponge128> {
 }
 
 /// Construct a Sponge256 directly from `data`
-/// 
-/// Example: 
-/// 
+///
+/// Example:
+///
 /// .. code-block:: python
-/// 
+///
 ///    >>> from xoflib import shake256
 ///    >>> xof = shake256(b"bytes to absorb")
 ///    >>> xof.read(16).hex()
@@ -213,11 +213,11 @@ fn shake256(data: &Bound<'_, PyAny>) -> PyResult<Sponge256> {
 }
 
 /// Construct a TurboSponge128 directly from `domain_sep` and `data`
-/// 
-/// Example: 
-/// 
+///
+/// Example:
+///
 /// .. code-block:: python
-/// 
+///
 ///    >>> from xoflib import turbo_shake128
 ///    >>> xof = turbo_shake128(1, b"bytes to absorb")
 ///    >>> xof.read(16).hex()
@@ -228,11 +228,11 @@ fn turbo_shake128(domain_sep: u8, data: &Bound<'_, PyAny>) -> PyResult<TurboSpon
 }
 
 /// Construct a TurboSponge256 directly from `domain_sep` and `data`
-/// 
-/// Example: 
-/// 
+///
+/// Example:
+///
 /// .. code-block:: python
-/// 
+///
 ///    >>> from xoflib import turbo_shake256
 ///    >>> xof = turbo_shake256(1, b"bytes to absorb")
 ///    >>> xof.read(16).hex()
