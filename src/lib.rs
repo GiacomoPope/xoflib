@@ -51,7 +51,19 @@ macro_rules! impl_sponge_shaker_classes {
 
         #[pymethods]
         impl $sponge_name {
-            #[doc=concat!("Read `n` bytes of data from the ", stringify!($hasher), " XOF")]
+            #[doc=concat!(
+                "Read `n` bytes of data from the ", stringify!($hasher), " XOF\n",
+                "\n",
+                "Example:\n",
+                "\n",
+                ".. code-block:: python\n",
+                "\n",
+                "   >>> from xoflib import ", $class_name, "\n",
+                "   >>> xof = ", impl_sponge_shaker_classes!(@docs_construct_hasher $hasher, $class_name), "\n",
+                "   >>> xof = xof.absorb(bytearray(b\"Ooh just a little bit more data\")).finalize()\n",
+                "   >>> xof.read(16).hex()\n",
+                "   ", impl_sponge_shaker_classes!(@docs_example_hash $hasher), "\n",
+            )]
             fn read<'py>(&mut self, py: Python<'py>, n: usize) -> PyResult<Bound<'py, PyBytes>> {
                 PyBytes::new_bound_with(py, n, |bytes| {
                     self.xof.read(bytes);
@@ -59,7 +71,21 @@ macro_rules! impl_sponge_shaker_classes {
                 })
             }
 
-            #[doc=concat!("Fill the input buffer with data from the ", stringify!($hasher), " XOF")]
+            #[doc=concat!(
+                "Fill the input buffer with data from the ", stringify!($hasher), " XOF",
+                "\n",
+                "Example:\n",
+                "\n",
+                ".. code-block:: python\n",
+                "\n",
+                "   >>> from xoflib import ", $class_name, "\n",
+                "   >>> xof = ", impl_sponge_shaker_classes!(@docs_construct_hasher $hasher, $class_name), "\n",
+                "   >>> xof = xof.absorb(bytearray(b\"Ooh just a little bit more data\")).finalize()\n",
+                "   >>> buf = bytearray(b\"\\0\" * 10)\n",
+                "   >>> xof.read_into(buf)\n",
+                "   >>> buf.hex()\n",
+                "   ", impl_sponge_shaker_classes!(@docs_example_hash $hasher), "\n",
+            )]
             fn read_into(&mut self, buf: &Bound<'_, PyAny>) -> PyResult<()> {
                 self.xof.read(pybuffer_get_bytes_mut(buf)?);
                 Ok(())
@@ -73,6 +99,36 @@ macro_rules! impl_sponge_shaker_classes {
                 self.__repr__()
             }
         }
+    };
+
+    // "match" on the TurboShakes and generate the correct constructor for them
+    (@docs_construct_hasher TurboShake128, $class_name:literal) => {
+        concat!($class_name, "(1, b\"bytes to absorb\")")
+    };
+
+    (@docs_construct_hasher TurboShake256, $class_name:literal) => {
+        concat!($class_name, "(1, b\"bytes to absorb\")")
+    };
+
+    (@docs_construct_hasher $hasher:ident, $class_name:literal) => {
+        concat!($class_name, "(b\"bytes to absorb\")")
+    };
+
+    // "match" on the hasher and generate the correct hash for the example
+    (@docs_example_hash Shake128) => {
+        "'2c67a3c30e75de37d30e3f6d94e05a00'"
+    };
+
+    (@docs_example_hash Shake256) => {
+        "'82786e027034dccb6f41224c22a227c9'"
+    };
+
+    (@docs_example_hash TurboShake128) => {
+        "'b6be317e80aa741b9f0ac9330d584506'"
+    };
+
+    (@docs_example_hash TurboShake256) => {
+        "'2e9d18d326438ea968b071ab958f6260'"
     };
 
     // "match" on the TurboShakes and generate a unique __init__ for them with domain separation
