@@ -14,9 +14,11 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 dynamic = ["version"]
-[tool.maturin]
-features = ["pyo3/extension-module"]
 
 [project.urls]
 Homepage = "https://github.com/GiacomoPope/xoflib"
 Issues = "https://github.com/GiacomoPope/xoflib/issues"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+sdist-include = ["LICENSE", "README.md"]
