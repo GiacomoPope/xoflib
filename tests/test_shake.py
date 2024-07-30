@@ -131,7 +131,7 @@ class TestShakeMonteCarlo(unittest.TestCase):
         for _ in range(100):
             for i in range(1000):
                 msg = shake((msg + bytes(16))[:16]).read(output_len)
-                output_len = int.from_bytes(msg[-2:]) % range_byte + minout_byte
+                output_len = int.from_bytes(msg[-2:], byteorder="big") % range_byte + minout_byte
             output_j.append(msg)
 
         return output_j
