@@ -13,6 +13,7 @@ elif sys.version_info >= (3, 10):
 else:
     from typing import ByteString as Buffer
 
+
 class TestTurboShakeDocumentation(unittest.TestCase):
     def parsed_data_test(self, shake, vectors):
         for test_vector in vectors:
