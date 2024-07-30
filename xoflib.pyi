@@ -1,9 +1,10 @@
 import sys
-
 if sys.version_info >= (3, 12):
     from collections.abc import Buffer
-else:
+elif sys.version_info >= (3, 10):
     Buffer = bytes | bytearray | memoryview
+else:
+    from typing import ByteString as Buffer
 
 class Shake128:
     def __init__(self, input_bytes: Buffer | None = None):
