@@ -129,6 +129,8 @@ We include rough benchmarks of the time it takes to read and absorb 100MB of
 data into each XOF in chunk sizes of 32B, 1KB and 1MB. Results are displayed in
 MB/s and are computed as the average throughput for running the test 100 times.
 
+### Intel
+
 | Algorithm      | Absorb (32B)   | Read (32B)   | Absorb (1KB)   | Read (1KB)   | Absorb (1MB)   | Read (1MB)   |
 |----------------|----------------|--------------|----------------|--------------|----------------|--------------|
 | AsconXof       | 84 MB/s        | 104 MB/s     | 147 MB/s       | 154 MB/s     | 160 MB/s       | 157 MB/s     |
@@ -140,6 +142,20 @@ MB/s and are computed as the average throughput for running the test 100 times.
 | TurboShaker256 | 130 MB/s       | 185 MB/s     | 470 MB/s       | 513 MB/s     | 556 MB/s       | 572 MB/s     |
 
 All times recorded using a Intel Core i7-9750H CPU.
+
+### ARM
+
+| Algorithm      | Absorb (32B)   | Read (32B)   | Absorb (1KB)   | Read (1KB)   | Absorb (1MB)   | Read (1MB)   |
+|----------------|----------------|--------------|----------------|--------------|----------------|--------------|
+| AsconXof       | 121 MB/s       | 144 MB/s     | 163 MB/s       | 171 MB/s     | 162 MB/s       | 175 MB/s     |
+| AsconAXof      | 157 MB/s       | 194 MB/s     | 235 MB/s       | 250 MB/s     | 242 MB/s       | 253 MB/s     |
+| Blake3         | 211 MB/s       | 250 MB/s     | 739 MB/s       | 849 MB/s     | 1767 MB/s      | 920 MB/s     |
+| Shake128       | 234 MB/s       | 341 MB/s     | 925 MB/s       | 997 MB/s     | 1041 MB/s      | 1082 MB/s    |
+| Shake256       | 220 MB/s       | 315 MB/s     | 764 MB/s       | 800 MB/s     | 843 MB/s       | 833 MB/s     |
+| TurboShaker128 | 277 MB/s       | 392 MB/s     | 1579 MB/s      | 1723 MB/s    | 1964 MB/s      | 2003 MB/s    |
+| TurboShaker256 | 269 MB/s       | 378 MB/s     | 1354 MB/s      | 1473 MB/s    | 1669 MB/s      | 1661 MB/s    |
+
+Times recorded using a Apple M2 CPU. Thanks are given to Bas Westerbaan for running the ARM benchmarks.
 
 ### Benchmarking against `hashlib`
 
