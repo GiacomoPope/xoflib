@@ -139,6 +139,8 @@ MB/s and are computed as the average throughput for running the test 100 times.
 | TurboShaker128 | 138 MB/s       | 197 MB/s     | 564 MB/s       | 615 MB/s     | 689 MB/s       | 709 MB/s     |
 | TurboShaker256 | 130 MB/s       | 185 MB/s     | 470 MB/s       | 513 MB/s     | 556 MB/s       | 572 MB/s     |
 
+All times recorded using a Intel Core i7-9750H CPU.
+
 ### Benchmarking against `hashlib`
 
 We find that `xoflib` performs equally with `hashlib` and is faster than the XOFs available `pycryptodome`.
