@@ -114,7 +114,22 @@ For more information, see the test file:
 **Note**: the test data from the draft-irtf-cfrg isn't very nice to parse, so it was copy pasted and hand-formatted into a more sensible data structure in 
 [tests/test_turbo_shake_data.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_turbo_shake_data.py).
 
-## Rough Benchmarking
+## Benchmarking
+
+We include rough benchmarks of the time it takes to read and absorb 100MB of
+data into each XOF in chunk sizes of 32B, 1KB and 1MB. Results are displayed in
+MB/s and are computed as the average throughput for running the test 100 times.
+
+| Algorithm     | Absorb (32B)   | Read (32B)   | Absorb (1KB)   | Read (1KB)   | Absorb (1MB)   | Read (1MB)   |
+|---------------|----------------|--------------|----------------|--------------|----------------|--------------|
+| Ascon         | 82 MB/s        | 102 MB/s     | 147 MB/s       | 145 MB/s     | 145 MB/s       | 152 MB/s     |
+| AsconA        | 96 MB/s        | 129 MB/s     | 209 MB/s       | 160 MB/s     | 164 MB/s       | 153 MB/s     |
+| Shake128      | 89 MB/s        | 102 MB/s     | 271 MB/s       | 193 MB/s     | 348 MB/s       | 316 MB/s     |
+| Shake256      | 79 MB/s        | 103 MB/s     | 222 MB/s       | 216 MB/s     | 234 MB/s       | 222 MB/s     |
+| TurboShake128 | 104 MB/s       | 144 MB/s     | 425 MB/s       | 477 MB/s     | 414 MB/s       | 505 MB/s     |
+| TurboShake256 | 126 MB/s       | 183 MB/s     | 477 MB/s       | 513 MB/s     | 534 MB/s       | 581 MB/s     |
+
+### Benchmarking against `hashlib`
 
 We find that `xoflib` performs equally with `hashlib` and is faster than the XOFs available `pycryptodome`.
 

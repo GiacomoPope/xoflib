@@ -1,157 +1,77 @@
+import os
 from timeit import timeit
-from hashlib import shake_128, shake_256
-from xoflib import Shake128, Shake256, TurboShake128, TurboShake256
-from Crypto.Hash.SHAKE128 import SHAKE128_XOF
-from Crypto.Hash.SHAKE256 import SHAKE256_XOF
-from shake_wrapper import shake_128_hashlib, shake_256_hashlib
+from xoflib import Shake128, Shake256, AsconXof, AsconAXof, TurboShake128, TurboShake256
+from tabulate import tabulate
+
+REPEAT = 1
+CHUNK_SIZES = [32, 2**10, 2**20]
+MB_COUNT = 100
+DATA_SIZE = MB_COUNT * 2**20  # MB_COUNT Mb of data read/absorb
 
 
-def xor_bytes(a, b):
-    return bytes(i ^ j for i, j in zip(a, b))
+def absorb_chunks(xof_shaker, chunks):
+    for chunk in chunks:
+        xof_shaker.absorb(chunk)
+    return xof_shaker.finalize()
 
 
-def benchmark_xoflib_stream(shake, absorb, c, n):
-    xof = shake(absorb).finalize()
-    res = bytes([0] * c)
-    for _ in range(n):
-        chunk = xof.read(c)
-        res = xor_bytes(res, chunk)
-    return res
+def read_chunks(xof_sponge, read_amount, read_count):
+    for _ in range(read_count):
+        val = xof_sponge.read(read_amount)
+    return val
 
 
-def benchmark_xoflib_turbo_stream(turboshake, absorb, c, n):
-    xof = turboshake(1, absorb).finalize()
-    res = bytes([0] * c)
-    for _ in range(n):
-        chunk = xof.read(c)
-        res = xor_bytes(res, chunk)
-    return res
-
-
-def benchmark_hashlib_one_call(shake, absorb, c, n):
-    """
-    Requires generating all c * n bytes in one go
-    """
-    xof = shake(absorb).digest(c * n)
-    xof_chunks = [xof[i : i + c] for i in range(0, c * n, c)]
-    assert len(xof_chunks) == n
-
-    res = bytes([0] * c)
-    for chunk in xof_chunks:
-        res = xor_bytes(res, chunk)
-    return res
-
-
-def benchmark_hashlib_stream(shake, absorb, c, n):
-    """
-    Requests only the bytes needed, but requires n calls to the digest
-    """
-    res = bytes([0] * c)
-    xof = shake(absorb)
-    for _ in range(n):
-        chunk = xof.read(c)
-        res = xor_bytes(res, chunk)
-    return res
-
-
-def benchmark_pycryptodome_stream(shake, absorb, c, n):
-    shake.__init__()
-    xof = shake.update(absorb)
-    res = bytes([0] * c)
-    for _ in range(n):
-        chunk = xof.read(c)
-        res = xor_bytes(res, chunk)
-    return res
-
-
-# Ensure things work
-a = benchmark_xoflib_stream(Shake128, b"benchmarking...", 123, 1000)
-b = benchmark_hashlib_one_call(shake_128, b"benchmarking...", 123, 1000)
-c = benchmark_hashlib_stream(shake_128_hashlib, b"benchmarking...", 123, 1000)
-d = benchmark_pycryptodome_stream(SHAKE128_XOF(), b"benchmarking...", 123, 1000)
-assert a == b == c == d
-
-benchmark_data = [
-    (1, 10_000, 100),
-    (100, 10_000, 100),
-    (1000, 1000, 100),
-    (10_000, 1000, 10),
-    (32, 100_000, 10),
+table_headers = [
+    "Algorithm",
+    "Absorb (32B)",
+    "Read (32B)",
+    "Absorb (1KB)",
+    "Read (1KB)",
+    "Absorb (1MB)",
+    "Read (1MB)",
 ]
+table_data = []
 
-for name, shakes in [
-    ("Shake128: ", (Shake128, shake_128, shake_128_hashlib, SHAKE128_XOF())),
-    ("Shake256: ", (Shake256, shake_256, shake_256_hashlib, SHAKE256_XOF())),
+for xof_shaker in [
+    AsconXof(),
+    AsconAXof(),
+    Shake128(),
+    Shake256(),
+    TurboShake128(1),
+    TurboShake256(1),
 ]:
-    print("=" * 80)
-    print(f"Benchmarking {name}")
-    print("=" * 80)
-    for c, n, number in benchmark_data:
-        print(f"Requesting {c} bytes from XOF {n} times")
-        xoflib_time = timeit(
-            'benchmark_xoflib_stream(shake, b"benchmarking...", c, n)',
+    print(f"Benchmarking: {str(xof_shaker)}")
+    # Check chunks of 32 bytes, 1kb, 1Mb
+    table_row = [str(xof_shaker)]
+    for chunk_size in CHUNK_SIZES:
+        # Benchmark absorption time
+        chunks = [os.urandom(chunk_size) for _ in range(DATA_SIZE // chunk_size)]
+        absorb_time = timeit(
+            "absorb_chunks(xof_shaker, chunks)",
             globals={
-                "shake": shakes[0],
-                "benchmark_xoflib_stream": benchmark_xoflib_stream,
-                "c": c,
-                "n": n,
+                "absorb_chunks": absorb_chunks,
+                "xof_shaker": xof_shaker,
+                "chunks": chunks,
             },
-            number=number,
-        )
-        print(f"xoflib: {xoflib_time:.2f}s")
+            number=REPEAT,
+        ) / REPEAT
 
-        hashlib_single_time = timeit(
-            'benchmark_hashlib_one_call(shake, b"benchmarking...", c, n)',
+        # Benchmark reading time
+        xof_sponge = absorb_chunks(xof_shaker, chunks)
+        read_count = len(chunks)
+        read_time = timeit(
+            "read_chunks(xof_sponge, read_amount, read_count)",
             globals={
-                "shake": shakes[1],
-                "benchmark_hashlib_one_call": benchmark_hashlib_one_call,
-                "c": c,
-                "n": n,
+                "read_chunks": read_chunks,
+                "xof_sponge": xof_sponge,
+                "read_amount": chunk_size,
+                "read_count": read_count,
             },
-            number=number,
-        )
-        print(f"hashlib (single call): {hashlib_single_time:.2f}s")
+            number=REPEAT,
+        ) / REPEAT
 
-        hashlib_stream_time = timeit(
-            'benchmark_hashlib_stream(shake, b"benchmarking...", c, n)',
-            globals={
-                "shake": shakes[2],
-                "benchmark_hashlib_stream": benchmark_hashlib_stream,
-                "c": c,
-                "n": n,
-            },
-            number=number,
-        )
-        print(f"hashlib (streaming): {hashlib_stream_time:.2f}s")
+        table_row.append(f"{MB_COUNT/(absorb_time):0.0f} MB/s")
+        table_row.append(f"{MB_COUNT/(read_time):0.0f} MB/s")
+    table_data.append(table_row)
 
-        pycryptodome_time = timeit(
-            'benchmark_pycryptodome_stream(shake, b"benchmarking...", c, n)',
-            globals={
-                "shake": shakes[3],
-                "benchmark_pycryptodome_stream": benchmark_pycryptodome_stream,
-                "c": c,
-                "n": n,
-            },
-            number=number,
-        )
-        print(f"pycryptodome: {pycryptodome_time:.2f}s")
-        print()
-
-for name, shake in [("TurboShake128", TurboShake128), ("TurboShake256", TurboShake256)]:
-    print("=" * 80)
-    print(f"Benchmarking {name}")
-    print("=" * 80)
-    for c, n, number in benchmark_data:
-        print(f"Requesting {c} bytes from XOF {n} times")
-        xoflib_time = timeit(
-            'benchmark_xoflib_stream(shake, b"benchmarking...", c, n)',
-            globals={
-                "shake": shakes[0],
-                "benchmark_xoflib_stream": benchmark_xoflib_stream,
-                "c": c,
-                "n": n,
-            },
-            number=number,
-        )
-        print(f"xoflib: {xoflib_time:.2f}s")
-        print()
+print(tabulate(table_data, table_headers, tablefmt="github"))
