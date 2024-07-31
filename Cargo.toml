@@ -14,4 +14,4 @@ crate-type = ["cdylib"]
 pyo3 = "0.21.0"
 sha3 = { version = "0.10.8", features = ["asm"] }
 ascon-hash = "0.2.0"
-blake3 = { version = "1.5.3", features = ["rayon", "traits-preview"] }
+blake3 = { version = "1.5.3", features = ["traits-preview"] }
