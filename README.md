@@ -4,9 +4,9 @@
 
 # xoflib
 
-A Python package for the Shake and Ascon extendable-output functions (XOFs). Built using
-[pyO3](https://github.com/PyO3/pyo3) bindings for the
-[`sha3`](https://docs.rs/sha3/latest/sha3/) and [`ascon-hash`](https://crates.io/crates/ascon-hash) crates.
+A Python package for the Ascon, BLAKE3, Shake (SHA3) and TurboShake extendable-output functions (XOFs). Built using
+[pyO3](https://github.com/PyO3/pyo3) bindings for the [`ascon-hash`](https://crates.io/crates/ascon-hash), [`blake3`](https://crates.io/crates/blake3) and
+[`sha3`](https://docs.rs/sha3/latest/sha3/) crates.
 
 ## Installation
 
@@ -18,8 +18,6 @@ pip install xoflib
 ```
 
 ## Algorithms
-
-We currently have pyO3 bindings for the four Shake XOF available in the [`sha3`](https://crates.io/crates/sha3) crate as well as the Ascon XOFs from the [`ascon-hash`](https://crates.io/crates/ascon-hash) crate.
 
 ### Ascon
 
@@ -81,6 +79,8 @@ Sponges can also be constructed directly:
 >>> sponge2 = shake128(b"a new XOF library")
 >>> assert sponge1.read(10) == sponge2.read(10)
 ```
+
+For other XOFs, see the [documentation](https://xoflib.readthedocs.io/en/stable/xoflib.html) which includes example usage for all classes.
 
 ### Motivation
 
