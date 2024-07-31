@@ -1,4 +1,4 @@
-use ascon_hash::{AsconAXof, AsconAXofReaderCore, AsconXof, AsconXofReaderCore};
+use ascon_hash::{AsconAXof, AsconAXofReader, AsconXof, AsconXofReaderCore};
 use pyo3::{
     buffer::PyBuffer,
     exceptions::{PyTypeError, PyValueError},
@@ -10,9 +10,12 @@ use sha3::{
         core_api::{CoreWrapper, XofReaderCoreWrapper},
         ExtendableOutputReset, Update, XofReader,
     },
-    Shake128, Shake128ReaderCore, Shake256, Shake256ReaderCore, TurboShake128, TurboShake128Core,
-    TurboShake128ReaderCore, TurboShake256, TurboShake256Core, TurboShake256ReaderCore,
+    Shake128, Shake128Reader, Shake256, Shake256Reader, TurboShake128, TurboShake128Core,
+    TurboShake128Reader, TurboShake256, TurboShake256Core, TurboShake256Reader,
 };
+
+// remove when https://github.com/RustCrypto/hashes/pull/610 lands
+type AsconXofReader = XofReaderCoreWrapper<AsconXofReaderCore>;
 
 fn pybuffer_get_bytes<'py>(data: &Bound<'py, PyAny>) -> PyResult<&'py [u8]> {
     let buf = PyBuffer::<u8>::get_bound(data)?;
@@ -47,7 +50,7 @@ macro_rules! impl_sponge_shaker_classes {
         #[pyclass(module="xoflib")]
         #[doc=concat!(stringify!($sponge_name), " implements sponge expansion for the ", stringify!($hasher), " XOF")]
         struct $sponge_name {
-            xof: XofReaderCoreWrapper<$xof_reader>,
+            xof: $xof_reader,
         }
 
         #[pymethods]
@@ -281,7 +284,7 @@ macro_rules! impl_sponge_shaker_classes {
 impl_sponge_shaker_classes!(
     hasher_name      = Shake128,
     pyclass_name     = "Shake128",
-    reader_name      = Shake128ReaderCore,
+    reader_name      = Shake128Reader,
     rust_shaker_name = Shaker128,
     rust_sponge_name = Sponge128
 );
@@ -289,7 +292,7 @@ impl_sponge_shaker_classes!(
 impl_sponge_shaker_classes!(
     hasher_name      = Shake256,
     pyclass_name     = "Shake256",
-    reader_name      = Shake256ReaderCore,
+    reader_name      = Shake256Reader,
     rust_shaker_name = Shaker256,
     rust_sponge_name = Sponge256
 );
@@ -297,7 +300,7 @@ impl_sponge_shaker_classes!(
 impl_sponge_shaker_classes!(
     hasher_name      = TurboShake128,
     pyclass_name     = "TurboShake128",
-    reader_name      = TurboShake128ReaderCore,
+    reader_name      = TurboShake128Reader,
     rust_shaker_name = TurboShaker128,
     rust_sponge_name = TurboSponge128
 );
@@ -305,7 +308,7 @@ impl_sponge_shaker_classes!(
 impl_sponge_shaker_classes!(
     hasher_name      = TurboShake256,
     pyclass_name     = "TurboShake256",
-    reader_name      = TurboShake256ReaderCore,
+    reader_name      = TurboShake256Reader,
     rust_shaker_name = TurboShaker256,
     rust_sponge_name = TurboSponge256
 );
@@ -314,7 +317,7 @@ impl_sponge_shaker_classes!(
 impl_sponge_shaker_classes!(
     hasher_name      = AsconXof,
     pyclass_name     = "AsconXof",
-    reader_name      = AsconXofReaderCore,
+    reader_name      = AsconXofReader,
     rust_shaker_name = Ascon,
     rust_sponge_name = AsconSponge,
 );
@@ -322,7 +325,7 @@ impl_sponge_shaker_classes!(
 impl_sponge_shaker_classes!(
     hasher_name      = AsconAXof,
     pyclass_name     = "AsconAXof",
-    reader_name      = AsconAXofReaderCore,
+    reader_name      = AsconAXofReader,
     rust_shaker_name = AsconA,
     rust_sponge_name = AsconASponge,
 );
