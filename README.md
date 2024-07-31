@@ -4,9 +4,9 @@
 
 # xoflib
 
-A Python package for the Shake and Ascon extendable-output functions (XOFs). Built using
-[pyO3](https://github.com/PyO3/pyo3) bindings for the
-[`sha3`](https://docs.rs/sha3/latest/sha3/) and [`ascon-hash`](https://crates.io/crates/ascon-hash) crates.
+A Python package for the Ascon, BLAKE3, Shake (SHA3) and TurboShake extendable-output functions (XOFs). Built using
+[pyO3](https://github.com/PyO3/pyo3) bindings for the [`ascon-hash`](https://crates.io/crates/ascon-hash), [`blake3`](https://crates.io/crates/blake3) and
+[`sha3`](https://docs.rs/sha3/latest/sha3/) crates.
 
 ## Installation
 
@@ -19,12 +19,14 @@ pip install xoflib
 
 ## Algorithms
 
-We currently have pyO3 bindings for the four Shake XOF available in the [`sha3`](https://crates.io/crates/sha3) crate as well as the Ascon XOFs from the [`ascon-hash`](https://crates.io/crates/ascon-hash) crate.
-
 ### Ascon
 
 - [AsconXof()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.AsconXof)
 - [AsconAXof()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.AsconAXof)
+
+### BLAKE3
+
+- [Blake3()](https://xoflib.readthedocs.io/en/stable/xoflib.html#xoflib.Blake3)
 
 ### Sha3
 
@@ -78,6 +80,8 @@ Sponges can also be constructed directly:
 >>> assert sponge1.read(10) == sponge2.read(10)
 ```
 
+For other XOFs, see the [documentation](https://xoflib.readthedocs.io/en/stable/xoflib.html) which includes example usage for all classes.
+
 ### Motivation
 
 For most hashing needs, the `hashlib` module is appropriate. However, the
@@ -100,6 +104,11 @@ The purpose of this package is to implement XOF for their intended use case, wit
 
 `AsconXOF` and `AsconAXof` are tested by comparing the output with the KAT vectors generated from [`pyascon`](https://github.com/meichlseder/pyascon). For more information, see the test file: [tests/test_ascon.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_ascon.py)
 
+### BLAKE3
+
+`Blake3` is tested by comparing the output with the KAT vectors downloaded from
+the [BLAKE3 team implementation](https://github.com/BLAKE3-team)  [`test_vectors.json`](https://github.com/BLAKE3-team/BLAKE3/blob/master/test_vectors/test_vectors.json). For more information, see the test file: [tests/test_blake3.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_blake3.py).
+
 ### Sha3
 
 `Shake128` and `Shake256` are tested by comparing the output with the KAT vectors downloaded from the "SHA-3 XOF Test Vectors for Byte-Oriented Output" section from [Cryptographic Algorithm Validation Program (CAVP)](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/secure-hashing). For more information, see the test file: [tests/test_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_shake.py).
@@ -120,14 +129,15 @@ We include rough benchmarks of the time it takes to read and absorb 100MB of
 data into each XOF in chunk sizes of 32B, 1KB and 1MB. Results are displayed in
 MB/s and are computed as the average throughput for running the test 100 times.
 
-| Algorithm     | Absorb (32B)   | Read (32B)   | Absorb (1KB)   | Read (1KB)   | Absorb (1MB)   | Read (1MB)   |
-|---------------|----------------|--------------|----------------|--------------|----------------|--------------|
-| Ascon         | 82 MB/s        | 102 MB/s     | 147 MB/s       | 145 MB/s     | 145 MB/s       | 152 MB/s     |
-| AsconA        | 96 MB/s        | 129 MB/s     | 209 MB/s       | 160 MB/s     | 164 MB/s       | 153 MB/s     |
-| Shake128      | 89 MB/s        | 102 MB/s     | 271 MB/s       | 193 MB/s     | 348 MB/s       | 316 MB/s     |
-| Shake256      | 79 MB/s        | 103 MB/s     | 222 MB/s       | 216 MB/s     | 234 MB/s       | 222 MB/s     |
-| TurboShake128 | 104 MB/s       | 144 MB/s     | 425 MB/s       | 477 MB/s     | 414 MB/s       | 505 MB/s     |
-| TurboShake256 | 126 MB/s       | 183 MB/s     | 477 MB/s       | 513 MB/s     | 534 MB/s       | 581 MB/s     |
+| Algorithm      | Absorb (32B)   | Read (32B)   | Absorb (1KB)   | Read (1KB)   | Absorb (1MB)   | Read (1MB)   |
+|----------------|----------------|--------------|----------------|--------------|----------------|--------------|
+| AsconXof       | 84 MB/s        | 104 MB/s     | 147 MB/s       | 154 MB/s     | 160 MB/s       | 157 MB/s     |
+| AsconAXof      | 100 MB/s       | 130 MB/s     | 210 MB/s       | 221 MB/s     | 222 MB/s       | 223 MB/s     |
+| Blake3         | 141 MB/s       | 195 MB/s     | 793 MB/s       | 900 MB/s     | 2935 MB/s      | 1022 MB/s    |
+| Shake128       | 116 MB/s       | 158 MB/s     | 320 MB/s       | 341 MB/s     | 368 MB/s       | 358 MB/s     |
+| Shake256       | 106 MB/s       | 144 MB/s     | 268 MB/s       | 281 MB/s     | 287 MB/s       | 297 MB/s     |
+| TurboShaker128 | 138 MB/s       | 197 MB/s     | 564 MB/s       | 615 MB/s     | 689 MB/s       | 709 MB/s     |
+| TurboShaker256 | 130 MB/s       | 185 MB/s     | 470 MB/s       | 513 MB/s     | 556 MB/s       | 572 MB/s     |
 
 ### Benchmarking against `hashlib`
 

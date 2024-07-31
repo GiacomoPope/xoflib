@@ -1,6 +1,6 @@
 import os
 from timeit import timeit
-from xoflib import Shake128, Shake256, AsconXof, AsconAXof, TurboShake128, TurboShake256
+from xoflib import Blake3, Shake128, Shake256, AsconXof, AsconAXof, TurboShake128, TurboShake256
 from tabulate import tabulate
 
 REPEAT = 1
@@ -35,6 +35,7 @@ table_data = []
 for xof_shaker in [
     AsconXof(),
     AsconAXof(),
+    Blake3(),
     Shake128(),
     Shake256(),
     TurboShake128(1),
