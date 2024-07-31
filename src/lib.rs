@@ -1,4 +1,5 @@
 use ascon_hash::{AsconAXof, AsconAXofReader, AsconXof, AsconXofReaderCore};
+use blake3::{Hasher as Blake3, OutputReader as Blake3Reader};
 use pyo3::{
     buffer::PyBuffer,
     exceptions::{PyTypeError, PyValueError},
@@ -38,7 +39,14 @@ fn pybuffer_get_bytes_mut<'py>(data: &Bound<'py, PyAny>) -> PyResult<&'py mut [u
 
 macro_rules! impl_sponge_shaker_classes {
     // hasher is tt so we can pick the right kind of methods to generate
-    (hasher_name = $hasher:tt, pyclass_name = $class_name:literal, reader_name = $xof_reader:ident, rust_shaker_name = $shaker_name:ident, rust_sponge_name = $sponge_name:ident $(,)?) => {
+    (
+        hasher_name = $hasher:tt,
+        pyclass_name = $class_name:literal,
+        reader_name = $xof_reader:ident,
+        rust_shaker_name = $shaker_name:ident,
+        rust_sponge_name = $sponge_name:ident,
+        example_hash = $example_hash:literal $(,)?
+    ) => {
         #[pyclass(module="xoflib", name=$class_name)]
         #[doc=concat!(stringify!($shaker_name), " implements absorption and finalization for the ", stringify!($hasher), " XOF")]
         struct $shaker_name {
@@ -66,7 +74,7 @@ macro_rules! impl_sponge_shaker_classes {
                 "   >>> xof = ", impl_sponge_shaker_classes!(@docs_construct_hasher $hasher, $class_name), "\n",
                 "   >>> xof = xof.absorb(bytearray(b\"Ooh just a little bit more data\")).finalize()\n",
                 "   >>> xof.read(16).hex()\n",
-                "   ", impl_sponge_shaker_classes!(@docs_example_hash $hasher), "\n",
+                "   ", $example_hash, "\n",
             )]
             fn read<'py>(&mut self, py: Python<'py>, n: usize) -> PyResult<Bound<'py, PyBytes>> {
                 PyBytes::new_bound_with(py, n, |bytes| {
@@ -88,7 +96,7 @@ macro_rules! impl_sponge_shaker_classes {
                 "   >>> buf = bytearray(b\"\\0\" * 10)\n",
                 "   >>> xof.read_into(buf)\n",
                 "   >>> buf.hex()\n",
-                "   ", impl_sponge_shaker_classes!(@docs_example_hash $hasher), "\n",
+                "   ", $example_hash, "\n",
             )]
             fn read_into(&mut self, buf: &Bound<'_, PyAny>) -> PyResult<()> {
                 self.xof.read(pybuffer_get_bytes_mut(buf)?);
@@ -116,31 +124,6 @@ macro_rules! impl_sponge_shaker_classes {
 
     (@docs_construct_hasher $hasher:ident, $class_name:literal) => {
         concat!($class_name, "(b\"bytes to absorb\")")
-    };
-
-    // "match" on the hasher and generate the correct hash for the example
-    (@docs_example_hash Shake128) => {
-        "'2c67a3c30e75de37d30e3f6d94e05a00'"
-    };
-
-    (@docs_example_hash Shake256) => {
-        "'82786e027034dccb6f41224c22a227c9'"
-    };
-
-    (@docs_example_hash TurboShake128) => {
-        "'b6be317e80aa741b9f0ac9330d584506'"
-    };
-
-    (@docs_example_hash TurboShake256) => {
-        "'2e9d18d326438ea968b071ab958f6260'"
-    };
-
-    (@docs_example_hash AsconXof) => {
-        "'202e12280fb6781470016dc067d3b213'"
-    };
-
-    (@docs_example_hash AsconAXof) => {
-        "'e3d5593d0e08c5a7c6cbf751fb817f0a'"
     };
 
     // "match" on the TurboShakes and generate a unique __init__ for them with domain separation
@@ -286,7 +269,8 @@ impl_sponge_shaker_classes!(
     pyclass_name     = "Shake128",
     reader_name      = Shake128Reader,
     rust_shaker_name = Shaker128,
-    rust_sponge_name = Sponge128
+    rust_sponge_name = Sponge128,
+    example_hash     = "'2c67a3c30e75de37d30e3f6d94e05a00'",
 );
 #[rustfmt::skip]
 impl_sponge_shaker_classes!(
@@ -294,7 +278,8 @@ impl_sponge_shaker_classes!(
     pyclass_name     = "Shake256",
     reader_name      = Shake256Reader,
     rust_shaker_name = Shaker256,
-    rust_sponge_name = Sponge256
+    rust_sponge_name = Sponge256,
+    example_hash = "'82786e027034dccb6f41224c22a227c9'",
 );
 #[rustfmt::skip]
 impl_sponge_shaker_classes!(
@@ -302,7 +287,8 @@ impl_sponge_shaker_classes!(
     pyclass_name     = "TurboShake128",
     reader_name      = TurboShake128Reader,
     rust_shaker_name = TurboShaker128,
-    rust_sponge_name = TurboSponge128
+    rust_sponge_name = TurboSponge128,
+    example_hash = "'b6be317e80aa741b9f0ac9330d584506'",
 );
 #[rustfmt::skip]
 impl_sponge_shaker_classes!(
@@ -310,7 +296,8 @@ impl_sponge_shaker_classes!(
     pyclass_name     = "TurboShake256",
     reader_name      = TurboShake256Reader,
     rust_shaker_name = TurboShaker256,
-    rust_sponge_name = TurboSponge256
+    rust_sponge_name = TurboSponge256,
+    example_hash = "'2e9d18d326438ea968b071ab958f6260'",
 );
 
 #[rustfmt::skip]
@@ -320,6 +307,7 @@ impl_sponge_shaker_classes!(
     reader_name      = AsconXofReader,
     rust_shaker_name = Ascon,
     rust_sponge_name = AsconSponge,
+    example_hash = "'202e12280fb6781470016dc067d3b213'",
 );
 #[rustfmt::skip]
 impl_sponge_shaker_classes!(
@@ -328,6 +316,17 @@ impl_sponge_shaker_classes!(
     reader_name      = AsconAXofReader,
     rust_shaker_name = AsconA,
     rust_sponge_name = AsconASponge,
+    example_hash = "'e3d5593d0e08c5a7c6cbf751fb817f0a'",
+);
+
+#[rustfmt::skip]
+impl_sponge_shaker_classes!(
+    hasher_name      = Blake3,
+    pyclass_name     = "Blake3",
+    reader_name      = Blake3Reader,
+    rust_shaker_name = Blake3Xof,
+    rust_sponge_name = Blake3Sponge,
+    example_hash = "'79c528b01f9519031bb3ebfbb4d99ecb'",
 );
 
 /// Construct a TurboSponge128 directly from `domain_sep` and `data`
@@ -412,6 +411,14 @@ impl_sponge_constructor!(
     example_hash  = "ae7ba96550a57300da1e2ba31335d922",
 );
 
+#[rustfmt::skip]
+impl_sponge_constructor!(
+    function_name = blake3_xof,
+    xof           = Blake3Xof,
+    sponge        = Blake3Sponge,
+    example_hash  = "not yet",
+);
+
 /// A Python package for the Shake extendable-output functions (XOFs): Shake128,
 /// Shake256 and the turbo variants built with pyO3 bindings to the sha3 Rust
 /// crate.
@@ -438,6 +445,11 @@ fn xoflib(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     m.add_function(wrap_pyfunction!(ascon_xof, m)?)?;
     m.add_function(wrap_pyfunction!(ascona_xof, m)?)?;
+
+    m.add_class::<Blake3Xof>()?;
+    m.add_class::<Blake3Sponge>()?;
+
+    m.add_function(wrap_pyfunction!(blake3_xof, m)?)?;
 
     Ok(())
 }
