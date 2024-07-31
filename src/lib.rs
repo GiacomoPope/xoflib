@@ -267,7 +267,7 @@ macro_rules! impl_sponge_shaker_classes {
             }
 
             fn __repr__(&self) -> String {
-                String::from(stringify!($shaker_name))
+                String::from($class_name)
             }
 
             fn __str__(&self) -> String {
