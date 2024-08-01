@@ -214,3 +214,10 @@ pycryptodome: 3.83s
 ```
 
 For more information, see the file [`benchmarks/benchmark_xof.py`](https://github.com/GiacomoPope/xoflib/blob/main/benchmarks/benchmark_xof.py).
+
+## Release Notes
+
+- v0.3.1: modify the `__str__()` and `__repr__()` methods of the `Shake` and `Sponge` classes
+- v0.3.0: include pyO3 bindings for BLAKE3 using the [`blake3`](https://crates.io/crates/blake3) crate
+- v0.2.0: include pyO3 bindings for Ascon and AsconA using the [`ascon-hash`](https://crates.io/crates/ascon-hash) crate
+- v0.1.0: include pyO3 bindings for Shake128, Shake256, TurboShake128 and  TurboShake256 using the [`sha3`](https://docs.rs/sha3/latest/sha3/) crate
