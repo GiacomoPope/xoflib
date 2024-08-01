@@ -103,12 +103,8 @@ macro_rules! impl_sponge_shaker_classes {
                 Ok(())
             }
 
-            fn __repr__(&self) -> String {
-                String::from(stringify!($sponge_name))
-            }
-
             fn __str__(&self) -> String {
-                self.__repr__()
+                String::from(stringify!($sponge_name))
             }
         }
     };
@@ -190,12 +186,8 @@ macro_rules! impl_sponge_shaker_classes {
                 }
             }
 
-            fn __repr__(&self) -> String {
-                String::from(stringify!($shaker_name))
-            }
-
             fn __str__(&self) -> String {
-                self.__repr__()
+                String::from($class_name)
             }
         }
     };
@@ -252,12 +244,8 @@ macro_rules! impl_sponge_shaker_classes {
                 }
             }
 
-            fn __repr__(&self) -> String {
-                String::from($class_name)
-            }
-
             fn __str__(&self) -> String {
-                self.__repr__()
+                String::from($class_name)
             }
         }
     };
