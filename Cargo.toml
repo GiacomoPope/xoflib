@@ -1,6 +1,6 @@
 [package]
 name = "xoflib"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,9 +9,7 @@ name = "xoflib"
 crate-type = ["cdylib"]
 
 [dependencies]
-# TODO: Update pyo3 to latest when the fix lands: 
-#       https://github.com/PyO3/pyo3/issues/4381
-pyo3 = "0.21.0"
+pyo3 = "0.25.0"
 sha3 = { version = "0.10.8", features = ["asm"] }
 ascon-hash = "0.2.0"
 blake3 = { version = "1.5.3", features = ["traits-preview"] }

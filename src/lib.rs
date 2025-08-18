@@ -19,14 +19,14 @@ use sha3::{
 type AsconXofReader = XofReaderCoreWrapper<AsconXofReaderCore>;
 
 fn pybuffer_get_bytes<'py>(data: &Bound<'py, PyAny>) -> PyResult<&'py [u8]> {
-    let buf = PyBuffer::<u8>::get_bound(data)?;
+    let buf = PyBuffer::<u8>::get(data)?;
 
     // SAFETY: we hold the GIL so it is safe to access data via buffer.buf_ptr
     Ok(unsafe { std::slice::from_raw_parts(buf.buf_ptr() as *const _, buf.len_bytes()) })
 }
 
 fn pybuffer_get_bytes_mut<'py>(data: &Bound<'py, PyAny>) -> PyResult<&'py mut [u8]> {
-    let buf = PyBuffer::<u8>::get_bound(data)?;
+    let buf = PyBuffer::<u8>::get(data)?;
 
     // SAFETY PRECONDITION: Ensure the data area is mutable
     if buf.readonly() {
@@ -77,7 +77,7 @@ macro_rules! impl_sponge_shaker_classes {
                 "   ", $example_hash, "\n",
             )]
             fn read<'py>(&mut self, py: Python<'py>, n: usize) -> PyResult<Bound<'py, PyBytes>> {
-                PyBytes::new_bound_with(py, n, |bytes| {
+                PyBytes::new_with(py, n, |bytes| {
                     self.xof.read(bytes);
                     Ok(())
                 })

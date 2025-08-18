@@ -85,8 +85,8 @@ For other XOFs, see the [documentation](https://xoflib.readthedocs.io/en/stable/
 ### Motivation
 
 For most hashing needs, the `hashlib` module is appropriate. However, the
-package maintainers have 
-[decided to not support Shake as an XOF](https://github.com/python/cpython/issues/82198) 
+package maintainers have
+[decided to not support Shake as an XOF](https://github.com/python/cpython/issues/82198)
 and simply treat it as another hash with digest. This means that if a user reads
 `n` bytes and then wishes for the next `m` bytes of output, they must generate
 `n + m` bytes from a `digest()` call and then slice the output for the last `m`
@@ -120,7 +120,7 @@ the IRTF CRFG examples [draft-irtf-cfrg-kangarootwelve-14](https://datatracker.i
 For more information, see the test file:
 [tests/test_turbo_shake.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_turbo_shake.py).
 
-**Note**: the test data from the draft-irtf-cfrg isn't very nice to parse, so it was copy pasted and hand-formatted into a more sensible data structure in 
+**Note**: the test data from the draft-irtf-cfrg isn't very nice to parse, so it was copy pasted and hand-formatted into a more sensible data structure in
 [tests/test_turbo_shake_data.py](https://github.com/GiacomoPope/xoflib/blob/main/tests/test_turbo_shake_data.py).
 
 ## Benchmarking
@@ -180,7 +180,7 @@ def benchmark_xof(shake, absorb, c, n):
 
 ```
 ================================================================================
- Benchmarking Shake256: 
+ Benchmarking Shake256:
 ================================================================================
 Requesting 1 bytes from XOF 10000 times
 xoflib: 0.69s
@@ -217,6 +217,7 @@ For more information, see the file [`benchmarks/benchmark_xof.py`](https://githu
 
 ## Release Notes
 
+- v0.4.0: modify CI and update pyO3 version for Python 3.13 support
 - v0.3.1: modify the `__str__()` and `__repr__()` methods of the `Shake` and `Sponge` classes
 - v0.3.0: include pyO3 bindings for BLAKE3 using the [`blake3`](https://crates.io/crates/blake3) crate
 - v0.2.0: include pyO3 bindings for Ascon and AsconA using the [`ascon-hash`](https://crates.io/crates/ascon-hash) crate
